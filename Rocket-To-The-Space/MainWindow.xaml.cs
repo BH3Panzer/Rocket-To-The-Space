@@ -30,7 +30,7 @@ namespace Rocket_To_The_Space
         private void InitializeTimer()
         {
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(16);
+            timer.Interval = TimeSpan.FromMilliseconds(1000/240);
             timer.Tick += UpdateCursor;
             timer.Start();
         }
