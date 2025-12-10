@@ -9,4 +9,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Fonts\DepartureMono-Regular.otf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\DepartureMono-Regular.otf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
 </Project>

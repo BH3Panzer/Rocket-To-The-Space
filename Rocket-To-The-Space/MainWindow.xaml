@@ -5,8 +5,48 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Rocket_To_The_Space"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+        Title="Rocket To The Space" Height="609" Width="520" ResizeMode="CanMinimize"
+        TextOptions.TextRenderingMode="Aliased"
+        RenderOptions.EdgeMode="Aliased"
+        >
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="pack://application:,,,/Rocket-To-The-Space;component/Fonts/#Departure Mono"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="FontFamily" Value="pack://application:,,,/Rocket-To-The-Space;component/Fonts/#Departure Mono"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="DarkGray"/>
+            <Setter Property="BorderBrush" Value="DimGray"/>
+            <Setter Property="BorderThickness" Value="8"/>
+            <Setter Property="FontFamily" Value="pack://application:,,,/Rocket-To-The-Space;component/Fonts/#Departure Mono"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                >
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="Yellow"/>
+                    <Setter Property="BorderBrush" Value="Gold"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="Gold"/>
+                    <Setter Property="BorderBrush" Value="Orange"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <ContentControl>
+        
+    </ContentControl>
 </Window>

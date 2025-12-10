@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="Rocket_To_The_Space.UCGameRules"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Rocket_To_The_Space"
+             mc:Ignorable="d" 
+             d:DesignHeight="609" d:DesignWidth="520">
+    <Grid>
+        <TextBlock FontSize="16" TextWrapping="WrapWithOverflow">
+            Votre but est d'atteindre l'espace en construisant la fusée la plus puissante, tout en optimisant le choix des composant.
+            <LineBreak/> <LineBreak/> Comment jouer :
+            <LineBreak/>
+            - pour obteir de nouvelles pièces, il faut aller dans la magasin. Attention, il y a un nombre limité de type de composant et de stock possible dans votre inventaire
+            <LineBreak/>
+            <LineBreak/>
+            - prend les composant dans ton inventaire pour aller les placer sur la fusée.
+            <LineBreak/>
+            <LineBreak/>
+            - vous pouvez cliquer sur les composants de la fusée pour les détruire, pour les récupérer dans l'inventaire et pour les améliorer
+        </TextBlock>
+    </Grid>
+</UserControl>
