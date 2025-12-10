@@ -10,10 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Img\cursor.png" />
+    <None Remove="Assets\Img\inventory_slot.png" />
     <None Remove="Fonts\DepartureMono-Regular.otf" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Img\cursor.png" />
+    <Resource Include="Assets\Img\inventory_slot.png" />
     <Resource Include="Fonts\DepartureMono-Regular.otf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

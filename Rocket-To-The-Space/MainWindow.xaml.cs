@@ -23,6 +23,7 @@ namespace Rocket_To_The_Space
             InitializeComponent();
             InitializeTimer();
             Cursor = Cursors.None;
+            cursor.IsHitTestVisible = false;
             ShowMainMenu();
         }
 
@@ -36,20 +37,22 @@ namespace Rocket_To_The_Space
 
         private void UpdateCursor(object? sender, EventArgs e)
         {
-            Point mousePos = Mouse.GetPosition(mainWindow);
+            Point mousePos = Mouse.GetPosition(mainCanvas);
+            Canvas.SetLeft(cursor, mousePos.X);
+            Canvas.SetTop(cursor, mousePos.Y);
         }
 
         private void ShowMainMenu()
         {
             UCMainMenu mainMenu = new UCMainMenu();
-            this.Content = mainMenu;
+            mainContentControl.Content = mainMenu;
             mainMenu.PlayButton.Click += ShowRuleScreen;
         }
 
         private void ShowRuleScreen(object sender, RoutedEventArgs e)
         {
             UCGameRules gameRules = new UCGameRules();
-            this.Content = gameRules;
+            mainContentControl.Content = gameRules;
         }
     }
 }
