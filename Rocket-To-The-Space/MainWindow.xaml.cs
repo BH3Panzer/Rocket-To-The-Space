@@ -53,6 +53,19 @@ namespace Rocket_To_The_Space
         {
             UCGameRules gameRules = new UCGameRules();
             mainContentControl.Content = gameRules;
+            gameRules.startButton.Click += ShowGameScreen;
+        }
+
+        private void ShowGameScreen(object sender, RoutedEventArgs e)
+        {
+            UCGame game = new UCGame();
+            mainContentControl.Content = game;
+            timer.Tick += UpdateGame;
+        }
+
+        private void UpdateGame(object? sender, EventArgs e)
+        {
+            
         }
     }
 }
