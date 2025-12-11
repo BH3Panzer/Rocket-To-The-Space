@@ -11,13 +11,22 @@
             Votre but est d'atteindre l'espace en construisant la fusée la plus puissante, tout en optimisant le choix des composant.
             <LineBreak/> <LineBreak/> Comment jouer :
             <LineBreak/>
-            - pour obteir de nouvelles pièces, il faut aller dans la magasin. Attention, il y a un nombre limité de type de composant et de stock possible dans votre inventaire
+            - pour obteir de nouvelles pièces, il faut aller dans le magasin. Attention, il y a un nombre limité de type de composant et de stock possible dans votre inventaire
             <LineBreak/>
             <LineBreak/>
-            - prend les composant dans ton inventaire pour aller les placer sur la fusée.
+            - prenez les composant dans votre inventaire pour aller les placer sur la fusée.
             <LineBreak/>
             <LineBreak/>
-            - vous pouvez cliquer sur les composants de la fusée pour les détruire, pour les récupérer dans l'inventaire ou pour les améliorer
+            - vous pouvez cliquer sur les composants de la fusée pour les détruire ou pour les récupérer dans l'inventaire
+            <LineBreak/>
+            <LineBreak/>
+            Pour décoler, il faut appuyer sur le bouton "Décoller"
         </TextBlock>
+        <Button x:Name="startButton" HorizontalAlignment="Left" Margin="105,450,0,0" VerticalAlignment="Top">
+            <AccessText>
+                _Démarrer la partie
+            </AccessText>
+        </Button>
+
     </Grid>
 </UserControl>
