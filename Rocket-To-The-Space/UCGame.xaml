@@ -6,15 +6,7 @@
              xmlns:local="clr-namespace:Rocket_To_The_Space"
              mc:Ignorable="d" 
              d:DesignHeight="609" d:DesignWidth="520">
-    <Grid>
-        <Image Margin="45,515,427,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-        <Image Margin="98,515,374,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-        <Image Margin="151,515,321,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-        <Image Margin="204,515,268,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-        <Image Margin="257,515,215,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-        <Image Margin="310,515,162,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-        <Image Margin="363,515,109,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-        <Image Margin="416,515,56,46" Source="/Assets/Img/inventory_slot.png" Stretch="Fill" Width="48" Height="48"/>
-
-    </Grid>
+    <Canvas x:Name="gameCanvas" Width="520" Height="609" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Rectangle Fill="White" Width="520" Height="609"/>
+    </Canvas>
 </UserControl>

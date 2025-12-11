@@ -24,5 +24,10 @@ namespace Rocket_To_The_Space
         {
             InitializeComponent();
         }
+
+        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }

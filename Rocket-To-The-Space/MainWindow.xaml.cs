@@ -9,7 +9,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
 namespace Rocket_To_The_Space
 {
     /// <summary>
@@ -18,6 +17,10 @@ namespace Rocket_To_The_Space
     public partial class MainWindow : Window
     {
         private DispatcherTimer timer;
+        private Slot[] slots = new Slot[8];
+        public UserControl currentUC;
+        private Slot lastSelectedSlot;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -25,6 +28,33 @@ namespace Rocket_To_The_Space
             Cursor = Cursors.None;
             cursor.IsHitTestVisible = false;
             ShowMainMenu();
+        }
+
+        private void InitializeSlots(UCGame ucGame)
+        {
+            for (int i = 0; i < slots.Length; i++)
+            {
+                int x = i * 48 + 60;
+                int y = 510;
+                Image texture = new Image();
+                BitmapImage textureBitmap = new BitmapImage();
+                texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot.png", UriKind.Absolute));
+                texture.Width = 48;
+                texture.Height = 48;
+                Image selectedTexture = new Image();
+                selectedTexture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot_selected.png", UriKind.Absolute));
+                ucGame.gameCanvas.Children.Add(texture);
+                selectedTexture.Width = 48;
+                selectedTexture.Height = 48;
+                selectedTexture.Visibility = Visibility.Hidden;
+                ucGame.gameCanvas.Children.Add(selectedTexture);
+                Canvas.SetLeft(texture, x);
+                Canvas.SetTop(texture, y);
+                Canvas.SetLeft(selectedTexture, x);
+                Canvas.SetTop(selectedTexture, y);
+                slots[i] = new Slot(texture, selectedTexture);
+
+            }   
         }
 
         private void InitializeTimer()
@@ -45,6 +75,7 @@ namespace Rocket_To_The_Space
         private void ShowMainMenu()
         {
             UCMainMenu mainMenu = new UCMainMenu();
+            currentUC = mainMenu;
             mainContentControl.Content = mainMenu;
             mainMenu.PlayButton.Click += ShowRuleScreen;
         }
@@ -52,6 +83,7 @@ namespace Rocket_To_The_Space
         private void ShowRuleScreen(object sender, RoutedEventArgs e)
         {
             UCGameRules gameRules = new UCGameRules();
+            currentUC = gameRules;
             mainContentControl.Content = gameRules;
             gameRules.startButton.Click += ShowGameScreen;
         }
@@ -59,13 +91,60 @@ namespace Rocket_To_The_Space
         private void ShowGameScreen(object sender, RoutedEventArgs e)
         {
             UCGame game = new UCGame();
+            currentUC = game;
+            InitializeSlots(game);
             mainContentControl.Content = game;
+            game.gameCanvas.MouseDown += GameClickHandler;
             timer.Tick += UpdateGame;
+        }
+
+        private void GameClickHandler(object sender, MouseButtonEventArgs e)
+        {
+            Slot slotClicked;
+            if (GetSelectedSlot(out slotClicked))
+            {
+                slotClicked.Select();
+                if (lastSelectedSlot != null && lastSelectedSlot != slotClicked)
+                {
+                    lastSelectedSlot.Deselect();
+                }
+                lastSelectedSlot = slotClicked;
+            } else
+            {
+                lastSelectedSlot?.Deselect();
+            }
         }
 
         private void UpdateGame(object? sender, EventArgs e)
         {
             
+        }
+
+        private bool GetSelectedSlot(out Slot selectedSlot)
+        {
+            Point mousePos = Mouse.GetPosition(mainCanvas);
+            foreach (Slot slot in slots)
+            {
+                if (IsSlotClicked(mousePos, slot))
+                {
+                    selectedSlot = slot;
+                    return true;
+                }
+            }
+            selectedSlot = null;
+            return false;
+        }
+
+        private bool IsSlotClicked(Point mousePos, Slot slot)
+        {
+            double slotX = Canvas.GetLeft(slot.Image);
+            double slotY = Canvas.GetTop(slot.Image);
+            if (mousePos.X >= slotX && mousePos.X <= slotX + slot.Image.Width &&
+                mousePos.Y >= slotY && mousePos.Y <= slotY + slot.Image.Height)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

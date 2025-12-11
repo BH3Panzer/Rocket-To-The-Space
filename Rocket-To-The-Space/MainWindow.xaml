@@ -14,6 +14,6 @@
         <ContentControl ClipToBounds="True">
             <ContentControl x:Name="mainContentControl"/>
         </ContentControl>
-        <Image x:Name="cursor" Source="pack://application:,,,/Assets/Img/cursor.png" Stretch="Fill" Height="59" Canvas.Left="157" Canvas.Top="47" Width="59" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Image x:Name="cursor" Source="pack://application:,,,/Assets/Img/cursor.png" Stretch="Fill" Height="32" Canvas.Left="157" Canvas.Top="47" Width="32" HorizontalAlignment="Left" VerticalAlignment="Top"/>
     </Canvas>
 </Window>
