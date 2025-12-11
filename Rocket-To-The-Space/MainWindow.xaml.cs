@@ -95,6 +95,7 @@ namespace Rocket_To_The_Space
             InitializeSlots(game);
             mainContentControl.Content = game;
             game.gameCanvas.MouseDown += GameClickHandler;
+            mainWindow.KeyDown += GameKeyPressHandler;
             timer.Tick += UpdateGame;
         }
 
@@ -103,17 +104,36 @@ namespace Rocket_To_The_Space
             Slot slotClicked;
             if (GetSelectedSlot(out slotClicked))
             {
-                slotClicked.Select();
-                if (lastSelectedSlot != null && lastSelectedSlot != slotClicked)
-                {
-                    lastSelectedSlot.Deselect();
-                }
-                lastSelectedSlot = slotClicked;
+               SelectSlot(slotClicked);
             } else
             {
                 lastSelectedSlot?.Deselect();
             }
         }
+
+        private void GameKeyPressHandler(object sender, KeyEventArgs e)
+        {
+            if (e.Key >= Key.D1 && e.Key <= Key.D8)
+            {
+                int slotIndex = e.Key - Key.D1;
+                SelectSlot(slots[slotIndex]);
+            }
+            if (e.Key >= Key.NumPad1 && e.Key <= Key.NumPad8)
+            {
+                int slotIndex = e.Key - Key.NumPad1;
+                SelectSlot(slots[slotIndex]);
+            }
+        }
+
+        private void SelectSlot(Slot slot)
+        {
+            slot.Select();
+            if (lastSelectedSlot != null && lastSelectedSlot != slot)
+            {
+                lastSelectedSlot.Deselect();
+            }
+            lastSelectedSlot = slot;
+        }  
 
         private void UpdateGame(object? sender, EventArgs e)
         {
