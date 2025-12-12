@@ -17,6 +17,8 @@ namespace Rocket_To_The_Space
         private bool isRocketLaunched = false;
         private Rocket? rocket;
         private Camera camera = new Camera(0, 0);
+        private double lastCameraX = 0;
+        private double lastCameraY = 0;
 
         public MainWindow()
         {
@@ -57,7 +59,7 @@ namespace Rocket_To_The_Space
         private void InitializeTimer()
         {
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1000/60);
+            timer.Interval = TimeSpan.FromMilliseconds(1000/240);
             timer.Tick += new EventHandler(Update);
             timer.Start();
         }
@@ -110,6 +112,10 @@ namespace Rocket_To_The_Space
         {
             //TODO: Check if rocket is ready to launch
             isRocketLaunched = true;
+            foreach (Slot slot in slots)
+            {
+                slot.Hide();
+            }
         }
 
         private void GameClickHandler(object sender, MouseButtonEventArgs e)
@@ -154,7 +160,7 @@ namespace Rocket_To_The_Space
             {
                 return;
             }
-            camera.Y -= Math.Round(rocket.Speed * 0.01, 2); 
+            camera.Y -= rocket.Speed; 
         }
 
         private void UpdateCamera()
@@ -165,11 +171,15 @@ namespace Rocket_To_The_Space
                 {
                     if (obj is Image)
                     {
+                        double deltaX = camera.X - lastCameraX;
+                        double deltaY = camera.Y - lastCameraY;
+                        lastCameraX = camera.X;
+                        lastCameraY = camera.Y;
                         Image image = (Image)obj;
                         double left = Canvas.GetLeft(image);
                         double top = Canvas.GetTop(image);
-                        Canvas.SetLeft(image, left - camera.X);
-                        Canvas.SetTop(image, top - camera.Y);
+                        Canvas.SetLeft(image, left - deltaX);
+                        Canvas.SetTop(image, top - deltaY);
                     }
                 }
             }
