@@ -239,7 +239,6 @@ namespace Rocket_To_The_Space
                         Canvas.SetTop(label, top - deltaY * BACKGROUND_SPEED_MULTIPLIER);
                     }
                 }
-                UpdateCurrentStage(deltaY);
             }
         }
 
@@ -274,13 +273,13 @@ namespace Rocket_To_The_Space
             }
         }
 
-        private void UpdateCurrentStage(double DeltaY)
+        private void UpdateCurrentStage()
         {
             if (currentStage == 7 || currentStage == 0)
             {
                 return;
             }
-            if (Canvas.GetTop(stageCheckpoint[currentStage - 1]) - DeltaY  >= camera.Y * BACKGROUND_SPEED_MULTIPLIER + mainWindow.ActualHeight)
+            if (Canvas.GetTop(stageCheckpoint[currentStage - 1]) + mainWindow.ActualHeight  >= mainWindow.ActualHeight)
             {
                 Console.WriteLine("Stage Up!");
                 currentStage++;
@@ -291,6 +290,7 @@ namespace Rocket_To_The_Space
         {
             UpdateRocket();
             UpdateDecoration();
+            UpdateCurrentStage();
             UpdateCamera();
         }
 
