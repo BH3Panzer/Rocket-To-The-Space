@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Rocket_To_The_Space
 {
@@ -11,7 +6,7 @@ namespace Rocket_To_The_Space
     {
         public double AirFrictionMultiplier { get; }
         public int ControlMultiplier { get; } 
-        public RocketCapsule(string name, int weight, int cost, Image texture, double airFrictionMultiplicator, int controlMultiplier) : base(name, weight, cost, texture)
+        public RocketCapsule(string name, int weight, int cost, Image texture, Canvas canvas, double airFrictionMultiplicator, int controlMultiplier) : base(name, weight, cost, texture, canvas)
         {
             this.AirFrictionMultiplier = airFrictionMultiplicator;
             this.ControlMultiplier = controlMultiplier;

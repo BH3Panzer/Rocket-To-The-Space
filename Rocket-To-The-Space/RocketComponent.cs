@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Rocket_To_The_Space
 {
@@ -13,12 +8,22 @@ namespace Rocket_To_The_Space
         public int Weight { get; private set; }
         public int Cost { get; set; }
         public Image Texture { get;}
-        protected RocketComponent(string name, int weight, int cost, Image texture)
+        private int x;
+        private int y;
+        private Canvas canvas;
+        protected RocketComponent(string name, int weight, int cost, Image texture, Canvas canvas)
         {
             Name = name;
             Weight = weight;
             Cost = cost;
             Texture = texture;
+            this.canvas = canvas;
+        }
+
+        public void SetX(int newX)
+        {
+            x = newX;
+
         }
     }
 }

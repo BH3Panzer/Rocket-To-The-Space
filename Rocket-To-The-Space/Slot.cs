@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows;
 
 namespace Rocket_To_The_Space
 {
     internal class Slot
     {
-        public Image Image { get; private set; }
-        public Image SelectedImage { get; private set; }
+        public Image Image { get;}
+        public Image SelectedImage { get; }
+        private RocketComponent? component;
+        private int componentQuantity;
         private bool isSelected;
         public Slot(Image image, Image selectedImage)
         {
@@ -32,6 +29,26 @@ namespace Rocket_To_The_Space
             isSelected = false;
             Image.Visibility = Visibility.Visible;
             SelectedImage.Visibility = Visibility.Hidden;
+        }
+
+        public void SetComponent(RocketComponent component)
+        {
+            this.component = component;
+        }
+
+        public RocketComponent GetRocketComponent()
+        {
+            return component;
+        }
+
+        public void SetQuantity(int quantity)
+        {
+            componentQuantity = quantity;
+        }
+
+        public int GetQuantity()
+        {
+            return componentQuantity;
         }
     }
 }

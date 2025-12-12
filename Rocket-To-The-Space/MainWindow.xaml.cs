@@ -1,13 +1,7 @@
-﻿using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 namespace Rocket_To_The_Space
 {
@@ -16,10 +10,10 @@ namespace Rocket_To_The_Space
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DispatcherTimer timer;
+        private DispatcherTimer? timer;
         private Slot[] slots = new Slot[8];
-        public UserControl currentUC;
-        private Slot lastSelectedSlot;
+        public UserControl? currentUC;
+        private Slot? lastSelectedSlot;
 
         public MainWindow()
         {
