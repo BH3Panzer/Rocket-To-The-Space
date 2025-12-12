@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>Rocket_To_The_Space</RootNamespace>
     <Nullable>enable</Nullable>
@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Img\asteroid.png" />
+    <None Remove="Assets\Img\bg.png" />
+    <None Remove="Assets\Img\cloud_decoration.png" />
+    <None Remove="Assets\Img\coin.png" />
     <None Remove="Assets\Img\cursor.png" />
     <None Remove="Assets\Img\inventory_slot.png" />
     <None Remove="Assets\Img\inventory_slot_selected.png" />
@@ -17,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Img\asteroid.png" />
+    <Resource Include="Assets\Img\bg.png" />
+    <Resource Include="Assets\Img\cloud_decoration.png" />
+    <Resource Include="Assets\Img\coin.png" />
     <Resource Include="Assets\Img\cursor.png" />
     <Resource Include="Assets\Img\inventory_slot.png" />
     <Resource Include="Assets\Img\inventory_slot_selected.png" />

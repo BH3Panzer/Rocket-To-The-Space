@@ -31,6 +31,24 @@ namespace Rocket_To_The_Space
             SelectedImage.Visibility = Visibility.Hidden;
         }
 
+        public void Hide()
+        {
+            Image.Visibility = Visibility.Hidden;
+            SelectedImage.Visibility = Visibility.Hidden;
+        }
+
+        public void Show()
+        {
+            if (isSelected)
+            {
+                SelectedImage.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Image.Visibility = Visibility.Visible;
+            }
+        }
+
         public void SetComponent(RocketComponent component)
         {
             this.component = component;

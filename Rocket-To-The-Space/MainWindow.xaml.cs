@@ -14,6 +14,9 @@ namespace Rocket_To_The_Space
         private Slot[] slots = new Slot[8];
         public UserControl? currentUC;
         private Slot? lastSelectedSlot;
+        private bool isRocketLaunched = false;
+        private Rocket? rocket;
+        private Camera camera = new Camera(0, 0);
 
         public MainWindow()
         {
@@ -54,9 +57,18 @@ namespace Rocket_To_The_Space
         private void InitializeTimer()
         {
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1000/240);
-            timer.Tick += UpdateCursor;
+            timer.Interval = TimeSpan.FromMilliseconds(1000/60);
+            timer.Tick += new EventHandler(Update);
             timer.Start();
+        }
+
+        private void Update(object? sender, EventArgs e)
+        {
+            UpdateCursor(sender, e);
+            if (currentUC is UCGame)
+            {
+                UpdateGame(sender, e);
+            }
         }
 
         private void UpdateCursor(object? sender, EventArgs e)
@@ -89,8 +101,15 @@ namespace Rocket_To_The_Space
             InitializeSlots(game);
             mainContentControl.Content = game;
             game.gameCanvas.MouseDown += GameClickHandler;
+            game.launchButton.Click += LaunchRocket;
             mainWindow.KeyDown += GameKeyPressHandler;
-            timer.Tick += UpdateGame;
+            rocket = new Rocket();
+        }
+
+        private void LaunchRocket(object sender, RoutedEventArgs e)
+        {
+            //TODO: Check if rocket is ready to launch
+            isRocketLaunched = true;
         }
 
         private void GameClickHandler(object sender, MouseButtonEventArgs e)
@@ -129,9 +148,37 @@ namespace Rocket_To_The_Space
             lastSelectedSlot = slot;
         }  
 
+        private void UpdateRocket()
+        {
+            if (!isRocketLaunched)
+            {
+                return;
+            }
+            camera.Y -= Math.Round(rocket.Speed * 0.01, 2); 
+        }
+
+        private void UpdateCamera()
+        {
+            if (currentUC is UCGame)
+            {
+                foreach (UIElement obj in ((UCGame) currentUC).gameCanvas.Children)
+                {
+                    if (obj is Image)
+                    {
+                        Image image = (Image)obj;
+                        double left = Canvas.GetLeft(image);
+                        double top = Canvas.GetTop(image);
+                        Canvas.SetLeft(image, left - camera.X);
+                        Canvas.SetTop(image, top - camera.Y);
+                    }
+                }
+            }
+        }
+
         private void UpdateGame(object? sender, EventArgs e)
         {
-            
+            UpdateRocket();
+            UpdateCamera();
         }
 
         private bool GetSelectedSlot(out Slot selectedSlot)

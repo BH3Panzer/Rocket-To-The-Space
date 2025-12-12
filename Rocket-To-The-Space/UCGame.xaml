@@ -8,5 +8,7 @@
              d:DesignHeight="609" d:DesignWidth="520">
     <Canvas x:Name="gameCanvas" Width="520" Height="609" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Rectangle Fill="White" Width="520" Height="609"/>
+        <Image Source="pack://application:,,,/Assets/Img/bg.png" Canvas.Top="-64965" StretchDirection="UpOnly" Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Center" MinWidth="520" Width="360"/>
+        <Button x:Name="launchButton" Content="Launch" Canvas.Left="206" Canvas.Top="10" HorizontalAlignment="Left" VerticalAlignment="Center"/>
     </Canvas>
 </UserControl>
