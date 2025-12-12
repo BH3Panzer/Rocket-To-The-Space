@@ -25,6 +25,7 @@ namespace Rocket_To_The_Space
         private static readonly double DECORATION_SPEED_MULTIPLIER = 0.2;
         private static readonly Random random = new Random();
         private Label[] stageCheckpoint = new Label[6];
+        private List<Obstacle> obstacles = new List<Obstacle>();
 
         public MainWindow()
         {
@@ -190,6 +191,21 @@ namespace Rocket_To_The_Space
 
         }
 
+        private void CreateAsteroid(int x, double y)
+        {
+            BitmapImage asteroid = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/asteroid.png", UriKind.Absolute));
+            Image asteroidImg = new Image();
+            asteroidImg.Source = asteroid;
+            asteroidImg.Width = 64;
+            asteroidImg.Height = 64;
+            Obstacle asteroidObstacle = new Obstacle(ObstacleType.ASTEROID, asteroidImg);
+            ((UCGame)currentUC).gameCanvas.Children.Add(asteroidImg);
+            Canvas.SetLeft(asteroidImg, x);
+            Canvas.SetTop(asteroidImg, y);
+            obstacles.Add(asteroidObstacle);
+
+        }
+
         private void UpdateRocket()
         {
             if (!isRocketLaunched)
@@ -281,8 +297,29 @@ namespace Rocket_To_The_Space
             }
             if (Canvas.GetTop(stageCheckpoint[currentStage - 1]) + mainWindow.ActualHeight  >= mainWindow.ActualHeight)
             {
-                Console.WriteLine("Stage Up!");
                 currentStage++;
+            }
+        }
+
+        private void UpdateObstacles()
+        {
+            if (currentStage == 4 || currentStage == 5)
+            {
+                int p = random.Next(0, 25);
+                if (p == 0)
+                {
+                    double y = camera.Y;
+                    int x = random.Next(0, (int)mainWindow.ActualWidth);
+                    CreateAsteroid(x, y);
+                }
+            }
+
+            foreach (Obstacle obstacle in obstacles)
+            {
+                if (obstacle.Type == ObstacleType.ASTEROID)
+                {
+                    obstacle.SetRotationAngle(obstacle.GetRotationAngle() + 1);
+                }
             }
         }
 
@@ -291,6 +328,7 @@ namespace Rocket_To_The_Space
             UpdateRocket();
             UpdateDecoration();
             UpdateCurrentStage();
+            UpdateObstacles();
             UpdateCamera();
         }
 
