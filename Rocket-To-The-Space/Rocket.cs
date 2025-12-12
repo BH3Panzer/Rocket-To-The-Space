@@ -13,7 +13,7 @@ namespace Rocket_To_The_Space
         public Rocket()
         {
             Components = new List<RocketComponent>();
-            Speed = 1;
+            Speed = 64;
         }
     }
 }

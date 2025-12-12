@@ -19,6 +19,12 @@ namespace Rocket_To_The_Space
         private Camera camera = new Camera(0, 0);
         private double lastCameraX = 0;
         private double lastCameraY = 0;
+        private List<Image> decoration = new List<Image>();
+        private int currentStage = 0;
+        private static readonly double BACKGROUND_SPEED_MULTIPLIER = 0.05;
+        private static readonly double DECORATION_SPEED_MULTIPLIER = 0.2;
+        private static readonly Random random = new Random();
+        private Label[] stageCheckpoint = new Label[6];
 
         public MainWindow()
         {
@@ -36,7 +42,6 @@ namespace Rocket_To_The_Space
                 int x = i * 48 + 60;
                 int y = 510;
                 Image texture = new Image();
-                BitmapImage textureBitmap = new BitmapImage();
                 texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot.png", UriKind.Absolute));
                 texture.Width = 48;
                 texture.Height = 48;
@@ -51,6 +56,8 @@ namespace Rocket_To_The_Space
                 Canvas.SetTop(texture, y);
                 Canvas.SetLeft(selectedTexture, x);
                 Canvas.SetTop(selectedTexture, y);
+                Panel.SetZIndex(texture, 3);
+                Panel.SetZIndex(selectedTexture, 3);
                 slots[i] = new Slot(texture, selectedTexture);
 
             }   
@@ -99,6 +106,15 @@ namespace Rocket_To_The_Space
         private void ShowGameScreen(object sender, RoutedEventArgs e)
         {
             UCGame game = new UCGame();
+            int i = 0;
+            foreach (UIElement obj in game.gameCanvas.Children)
+            {
+                if (obj is Label)
+                {
+                    stageCheckpoint[i] = (Label) obj;
+                    i++;
+                }
+            }
             currentUC = game;
             InitializeSlots(game);
             mainContentControl.Content = game;
@@ -112,6 +128,7 @@ namespace Rocket_To_The_Space
         {
             //TODO: Check if rocket is ready to launch
             isRocketLaunched = true;
+            currentStage = 1;
             foreach (Slot slot in slots)
             {
                 slot.Hide();
@@ -124,7 +141,7 @@ namespace Rocket_To_The_Space
             if (GetSelectedSlot(out slotClicked))
             {
                SelectSlot(slotClicked);
-            } else
+            } else if (!isRocketLaunched)
             {
                 lastSelectedSlot?.Deselect();
             }
@@ -154,6 +171,25 @@ namespace Rocket_To_The_Space
             lastSelectedSlot = slot;
         }  
 
+        private void CreateCloud(int x, double y)
+        {
+            BitmapImage cloud = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/cloud_decoration.png", UriKind.Absolute));
+            Image cloudImg = new Image();
+            cloudImg.Source = cloud;
+            cloudImg.Width = 64;
+            cloudImg.Height = 64;
+            cloudImg.Tag = "decoration_cloud";
+            if (currentUC is UCGame)
+            {
+                ((UCGame)currentUC).gameCanvas.Children.Add(cloudImg);
+            }
+            Canvas.SetLeft(cloudImg, x);
+            Canvas.SetTop(cloudImg, y);
+            Panel.SetZIndex(cloudImg, 1);
+            decoration.Add(cloudImg);
+
+        }
+
         private void UpdateRocket()
         {
             if (!isRocketLaunched)
@@ -167,27 +203,94 @@ namespace Rocket_To_The_Space
         {
             if (currentUC is UCGame)
             {
-                foreach (UIElement obj in ((UCGame) currentUC).gameCanvas.Children)
+                double deltaX = camera.X - lastCameraX;
+                double deltaY = camera.Y - lastCameraY;
+                lastCameraX = camera.X;
+                lastCameraY = camera.Y;
+                foreach (UIElement obj in ((UCGame)currentUC).gameCanvas.Children)
                 {
                     if (obj is Image)
                     {
-                        double deltaX = camera.X - lastCameraX;
-                        double deltaY = camera.Y - lastCameraY;
-                        lastCameraX = camera.X;
-                        lastCameraY = camera.Y;
                         Image image = (Image)obj;
                         double left = Canvas.GetLeft(image);
                         double top = Canvas.GetTop(image);
-                        Canvas.SetLeft(image, left - deltaX);
-                        Canvas.SetTop(image, top - deltaY);
+                        double localDeltaX = deltaX;
+                        double localDeltaY = deltaY;
+                        if (Panel.GetZIndex(obj) == 0)
+                        {
+                            localDeltaX *= BACKGROUND_SPEED_MULTIPLIER;
+                            localDeltaY *= BACKGROUND_SPEED_MULTIPLIER;
+                        }
+
+                        if (Panel.GetZIndex(obj) == 1)
+                        {
+                            localDeltaX *= DECORATION_SPEED_MULTIPLIER;
+                            localDeltaY *= DECORATION_SPEED_MULTIPLIER;
+                        }
+                        Canvas.SetLeft(image, left - localDeltaX);
+                        Canvas.SetTop(image, top - localDeltaY);
+                    }
+                    if (obj is Label)
+                    {
+                        Label label = (Label)obj;
+                        double left = Canvas.GetLeft(label);
+                        double top = Canvas.GetTop(label);
+                        Canvas.SetLeft(label, left - deltaX * BACKGROUND_SPEED_MULTIPLIER);
+                        Canvas.SetTop(label, top - deltaY * BACKGROUND_SPEED_MULTIPLIER);
                     }
                 }
+                UpdateCurrentStage(deltaY);
+            }
+        }
+
+        private void UpdateDecoration()
+        {
+            if (currentStage == 1)
+            {
+                int p = random.Next(0,100);
+                if (p == 0)
+                {
+                    int x = random.Next(0, (int)mainWindow.ActualWidth);
+                    double y = camera.Y;
+                    CreateCloud(x, y);
+                }
+                List<Image> cloudToRemove = new List<Image>();
+                foreach (Image cloud in decoration)
+                {
+       
+                    if (Canvas.GetTop(cloud) >= ((UCGame)currentUC).gameCanvas.ActualHeight)
+                    {
+                        cloudToRemove.Add(cloud);
+                        if (currentUC is UCGame)
+                        {
+                            ((UCGame)currentUC).gameCanvas.Children.Remove(cloud);
+                        }
+                    }
+                }
+                foreach (Image cloud in cloudToRemove)
+                {
+                    decoration.Remove(cloud);
+                }
+            }
+        }
+
+        private void UpdateCurrentStage(double DeltaY)
+        {
+            if (currentStage == 7 || currentStage == 0)
+            {
+                return;
+            }
+            if (Canvas.GetTop(stageCheckpoint[currentStage - 1]) - DeltaY  >= camera.Y * BACKGROUND_SPEED_MULTIPLIER + mainWindow.ActualHeight)
+            {
+                Console.WriteLine("Stage Up!");
+                currentStage++;
             }
         }
 
         private void UpdateGame(object? sender, EventArgs e)
         {
             UpdateRocket();
+            UpdateDecoration();
             UpdateCamera();
         }
 
