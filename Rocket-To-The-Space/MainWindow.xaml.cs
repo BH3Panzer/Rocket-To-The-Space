@@ -167,6 +167,10 @@ namespace Rocket_To_The_Space
             {
                 slot.Hide();
             }
+            UCGame game = (UCGame)currentUC;
+            game.launchpad.Visibility = Visibility.Hidden;
+            game.launchButton.Visibility = Visibility.Hidden;
+
         }
 
         private void GameClickHandler(object sender, MouseButtonEventArgs e)
@@ -300,7 +304,7 @@ namespace Rocket_To_The_Space
                 if (p == 0)
                 {
                     int x = random.Next(0, (int)mainWindow.ActualWidth);
-                    double y = camera.Y;
+                    double y = -20;
                     CreateCloud(x, y);
                 }
                 List<Image> cloudToRemove = new List<Image>();
@@ -339,11 +343,12 @@ namespace Rocket_To_The_Space
         {
             if (currentStage == 4 || currentStage == 5)
             {
-                int p = random.Next(0, 25);
+                int p = random.Next(0,100) ;
                 if (p == 0)
                 {
-                    double y = camera.Y;
+                    double y = -20;
                     int x = random.Next(0, (int)mainWindow.ActualWidth);
+                    Console.WriteLine($"created asteroid at x = {x} y = {y}");
                     CreateAsteroid(x, y);
                 }
             }
@@ -391,6 +396,23 @@ namespace Rocket_To_The_Space
                 return true;
             }
             return false;
+        }
+
+        Geometry CreateRectGeometry(FrameworkElement e)
+        {
+            return new RectangleGeometry(
+                new Rect(0, 0, e.ActualWidth, e.ActualHeight));
+        }
+
+        bool IsColliding(FrameworkElement a, FrameworkElement b)
+        {
+            Geometry g1 = CreateRectGeometry(a);
+            Geometry g2 = CreateRectGeometry(b);
+
+            g1.Transform = a.TransformToVisual(null) as Transform;
+            g2.Transform = b.TransformToVisual(null) as Transform;
+
+            return g1.FillContainsWithDetail(g2) != IntersectionDetail.Empty;
         }
     }
 }
