@@ -12,12 +12,16 @@
   <ItemGroup>
     <None Remove="Assets\Img\asteroid.png" />
     <None Remove="Assets\Img\bg.png" />
+    <None Remove="Assets\Img\bg_menu.png" />
     <None Remove="Assets\Img\cloud_decoration.png" />
     <None Remove="Assets\Img\coin.png" />
     <None Remove="Assets\Img\cursor.png" />
     <None Remove="Assets\Img\inventory_slot.png" />
     <None Remove="Assets\Img\inventory_slot_selected.png" />
+    <None Remove="Assets\Img\plane.png" />
+    <None Remove="Assets\Img\rules.png" />
     <None Remove="Assets\Img\starting_point.png" />
+    <None Remove="Assets\Img\UFO.png" />
     <None Remove="Assets\Music\BH3Panzer - To the Space.mp3" />
     <None Remove="Assets\Music\BH3Panzer - To the Space.ogg" />
     <None Remove="Fonts\DepartureMono-Regular.otf" />
@@ -32,12 +36,16 @@
   <ItemGroup>
     <Resource Include="Assets\Img\asteroid.png" />
     <Resource Include="Assets\Img\bg.png" />
+    <Resource Include="Assets\Img\bg_menu.png" />
     <Resource Include="Assets\Img\cloud_decoration.png" />
     <Resource Include="Assets\Img\coin.png" />
     <Resource Include="Assets\Img\cursor.png" />
     <Resource Include="Assets\Img\inventory_slot.png" />
     <Resource Include="Assets\Img\inventory_slot_selected.png" />
+    <Resource Include="Assets\Img\plane.png" />
+    <Resource Include="Assets\Img\rules.png" />
     <Resource Include="Assets\Img\starting_point.png" />
+    <Resource Include="Assets\Img\UFO.png" />
     <Resource Include="Fonts\DepartureMono-Regular.otf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>

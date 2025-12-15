@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 namespace Rocket_To_The_Space
 {
@@ -29,6 +30,7 @@ namespace Rocket_To_The_Space
         private double[] initialStageCheckpointY = new double[6];
         private List<Obstacle> obstacles = new List<Obstacle>();
         private MediaPlayer mediaPlayer = new MediaPlayer();
+        private uint launchCount = 0;
 
         public MainWindow()
         {
@@ -98,6 +100,7 @@ namespace Rocket_To_The_Space
             mainContentControl.Content = mainMenu;
             mainMenu.PlayButton.Click += ShowRuleScreen;
             mediaPlayer.Open(new Uri("Assets/Music/BH3Panzer - To the Space.mp3", UriKind.Relative));
+            mediaPlayer.Volume = 0.5;
             mediaPlayer.Play();
         }
 
@@ -107,14 +110,13 @@ namespace Rocket_To_The_Space
             currentUC = gameRules;
             mainContentControl.Content = gameRules;
             gameRules.startButton.Click += ShowGameScreen;
+            mediaPlayer.Stop();
         }
 
         private void ShowGameScreen(object sender, RoutedEventArgs e)
         {
             UCGame game = new UCGame();
             int i = 0;
-
-            mediaPlayer.Stop();
 
             foreach (UIElement obj in game.gameCanvas.Children)
             {
@@ -132,6 +134,7 @@ namespace Rocket_To_The_Space
             game.launchButton.Click += LaunchRocket;
             mainWindow.KeyDown += GameKeyPressHandler;
             rocket = new Rocket();
+            rocket.Init(game);
 #if DEBUG
             mainWindow.KeyDown += DebugKeyHandler;
         }
@@ -162,6 +165,7 @@ namespace Rocket_To_The_Space
         {
             //TODO: Check if rocket is ready to launch
             isRocketLaunched = true;
+            launchCount++;
             currentStage = 1;
             foreach (Slot slot in slots)
             {
@@ -249,7 +253,8 @@ namespace Rocket_To_The_Space
             {
                 return;
             }
-            camera.Y -= rocket.Speed; 
+            rocket.Update((UCGame)currentUC);
+            camera.Y -= rocket.Speed;
         }
 
         private void UpdateCamera()
@@ -290,6 +295,16 @@ namespace Rocket_To_The_Space
                         double top = Canvas.GetTop(label);
                         Canvas.SetLeft(label, left - deltaX * BACKGROUND_SPEED_MULTIPLIER);
                         Canvas.SetTop(label, top - deltaY * BACKGROUND_SPEED_MULTIPLIER);
+                    }
+                    if (obj is Rectangle)
+                    { 
+                        Rectangle rec = (Rectangle)obj;
+                        double left = Canvas.GetLeft(rec);
+                        double top = Canvas.GetTop(rec);
+                        double localDeltaX = deltaX;
+                        double localDeltaY = deltaY;
+                        Canvas.SetLeft(rec, left - localDeltaX);
+                        Canvas.SetTop(rec, top - localDeltaY);
                     }
                 }
             }
