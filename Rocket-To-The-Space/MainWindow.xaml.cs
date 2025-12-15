@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 namespace Rocket_To_The_Space
@@ -26,6 +27,7 @@ namespace Rocket_To_The_Space
         private static readonly Random random = new Random();
         private Label[] stageCheckpoint = new Label[6];
         private List<Obstacle> obstacles = new List<Obstacle>();
+        private MediaPlayer mediaPlayer = new MediaPlayer();
 
         public MainWindow()
         {
@@ -94,6 +96,9 @@ namespace Rocket_To_The_Space
             currentUC = mainMenu;
             mainContentControl.Content = mainMenu;
             mainMenu.PlayButton.Click += ShowRuleScreen;
+            mediaPlayer.Open(new Uri("Assets/Music/BH3Panzer - To the Space.ogg", UriKind.Relative));
+            mediaPlayer.Volume = 0.5;
+            mediaPlayer.Play();
         }
 
         private void ShowRuleScreen(object sender, RoutedEventArgs e)
@@ -108,6 +113,9 @@ namespace Rocket_To_The_Space
         {
             UCGame game = new UCGame();
             int i = 0;
+
+            mediaPlayer.Stop();
+
             foreach (UIElement obj in game.gameCanvas.Children)
             {
                 if (obj is Label)

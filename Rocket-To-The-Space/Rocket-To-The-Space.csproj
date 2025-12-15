@@ -17,7 +17,14 @@
     <None Remove="Assets\Img\cursor.png" />
     <None Remove="Assets\Img\inventory_slot.png" />
     <None Remove="Assets\Img\inventory_slot_selected.png" />
+    <None Remove="Assets\Music\BH3Panzer - To the Space.ogg" />
     <None Remove="Fonts\DepartureMono-Regular.otf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Music\BH3Panzer - To the Space.ogg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
