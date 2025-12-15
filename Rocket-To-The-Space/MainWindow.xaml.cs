@@ -25,6 +25,7 @@ namespace Rocket_To_The_Space
         private static readonly double DECORATION_SPEED_MULTIPLIER = 0.2;
         private static readonly Random random = new Random();
         private Label[] stageCheckpoint = new Label[6];
+        private double[] initialStageCheckpointY = new double[6];
         private List<Obstacle> obstacles = new List<Obstacle>();
 
         public MainWindow()
@@ -112,7 +113,8 @@ namespace Rocket_To_The_Space
             {
                 if (obj is Label)
                 {
-                    stageCheckpoint[i] = (Label) obj;
+                    stageCheckpoint[i] = (Label)obj;
+                    initialStageCheckpointY[i] = Canvas.GetTop(obj);
                     i++;
                 }
             }
@@ -123,7 +125,32 @@ namespace Rocket_To_The_Space
             game.launchButton.Click += LaunchRocket;
             mainWindow.KeyDown += GameKeyPressHandler;
             rocket = new Rocket();
+#if DEBUG
+            mainWindow.KeyDown += DebugKeyHandler;
         }
+
+        private void DebugKeyHandler(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftAlt))
+            {
+                if (e.Key >= Key.D1 && e.Key <= Key.D6)
+                {
+                    JumpToStage(e.Key - Key.D1);
+                }
+            }
+        }
+
+        private void JumpToStage(int stageIndex)
+        {
+            currentStage = stageIndex + 1;
+            camera.Y = initialStageCheckpointY[stageIndex] / BACKGROUND_SPEED_MULTIPLIER;
+            Console.WriteLine($"camera.y : {camera.Y} stageIndex : {stageIndex}");
+        }
+#else
+        }
+#endif
+
+
 
         private void LaunchRocket(object sender, RoutedEventArgs e)
         {
@@ -202,6 +229,7 @@ namespace Rocket_To_The_Space
             ((UCGame)currentUC).gameCanvas.Children.Add(asteroidImg);
             Canvas.SetLeft(asteroidImg, x);
             Canvas.SetTop(asteroidImg, y);
+            Panel.SetZIndex(asteroidImg, 2);
             obstacles.Add(asteroidObstacle);
 
         }
