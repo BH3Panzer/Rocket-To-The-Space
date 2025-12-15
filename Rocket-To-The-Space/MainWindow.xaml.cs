@@ -168,7 +168,6 @@ namespace Rocket_To_The_Space
                 slot.Hide();
             }
             UCGame game = (UCGame)currentUC;
-            game.launchpad.Visibility = Visibility.Hidden;
             game.launchButton.Visibility = Visibility.Hidden;
 
         }
@@ -300,7 +299,7 @@ namespace Rocket_To_The_Space
         {
             if (currentStage == 1)
             {
-                int p = random.Next(0,100);
+                int p = random.Next(0,500);
                 if (p == 0)
                 {
                     int x = random.Next(0, (int)mainWindow.ActualWidth);
