@@ -144,7 +144,6 @@ namespace Rocket_To_The_Space
         {
             currentStage = stageIndex + 1;
             camera.Y = initialStageCheckpointY[stageIndex] / BACKGROUND_SPEED_MULTIPLIER;
-            Console.WriteLine($"camera.y : {camera.Y} stageIndex : {stageIndex}");
         }
 #else
         }
