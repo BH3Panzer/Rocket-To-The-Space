@@ -96,8 +96,7 @@ namespace Rocket_To_The_Space
             currentUC = mainMenu;
             mainContentControl.Content = mainMenu;
             mainMenu.PlayButton.Click += ShowRuleScreen;
-            mediaPlayer.Open(new Uri("Assets/Music/BH3Panzer - To the Space.ogg", UriKind.Relative));
-            mediaPlayer.Volume = 0.5;
+            mediaPlayer.Open(new Uri("Assets/Music/BH3Panzer - To the Space.mp3", UriKind.Relative));
             mediaPlayer.Play();
         }
 
