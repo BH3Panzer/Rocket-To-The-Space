@@ -8,7 +8,8 @@
              d:DesignHeight="609" d:DesignWidth="520" HorizontalAlignment="Left" VerticalAlignment="Top" Height="609" Width="520"
              >
     <Grid>
-        <Label Content="Rocket To The Space" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,10,0,0"/>
+        <Image Margin="0,0,-1,0" Source="pack://application:,,,/Assets/Img/bg_menu.png" Stretch="Fill"/>
+        <Label Content="Rocket To The Space" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,10,0,0" Foreground="White"/>
         <Button x:Name="PlayButton" HorizontalAlignment="Center" Margin="0,160,0,0" VerticalAlignment="Top" Height="69" Width="136">
             <AccessText>
                 _Jouer

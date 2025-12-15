@@ -6,18 +6,18 @@ namespace Rocket_To_The_Space
     {
         public string Name { get; private set; }
         public int Weight { get; private set; }
-        public int Cost { get; set; }
+        public decimal Cost { get; set; }
         public Image Texture { get;}
         private int x;
         private int y;
-        private Canvas canvas;
-        protected RocketComponent(string name, int weight, int cost, Image texture, Canvas canvas)
+        public Canvas Canvas;
+        protected RocketComponent(string name, int weight, decimal cost, Image texture, Canvas canvas)
         {
             Name = name;
             Weight = weight;
             Cost = cost;
             Texture = texture;
-            this.canvas = canvas;
+            this.Canvas = canvas;
         }
 
         public void SetX(int newX)

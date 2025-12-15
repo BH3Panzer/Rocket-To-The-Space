@@ -29,6 +29,31 @@ namespace Rocket_To_The_Space
         private double[] initialStageCheckpointY = new double[6];
         private List<Obstacle> obstacles = new List<Obstacle>();
         private MediaPlayer mediaPlayer = new MediaPlayer();
+        private Slot[] shopSlots = new Slot[8];
+        private Slot lastSelectedShopSlot;
+        private static readonly decimal WOOD_MIN_PRICE = 0.5m;
+        private static readonly decimal WOOD_MAX_PRICE = 10m;
+        private static readonly int WOOD_MIN_WEIGHT = 10;
+        private static readonly int WOOD_MAX_WEIGHT = 20;
+        private static readonly int WOOD_MIN_BOOSTER_THRUST_POWER = 80;
+        private static readonly int WOOD_MAX_BOOSTER_THRUST_POWER = 100;
+        private static readonly int WOOD_MAX_ENERGY = 1000;
+        private static readonly double WOOD_CAPSULE_CONTROL_MULTIPLIER = 0.5;
+        private static readonly int WOOD_ENGINE_MIN_THRUST_POWER = 50;
+        private static readonly int WOOD_ENGINE_MAX_THRUST_POWER = 100;
+        private static readonly int WOOD_TANK_FUEL_CAPACITY = 1000;
+        private static readonly decimal PLASTIC_MIN_PRICE = 20m;
+        private static readonly decimal PLASTIC_MAX_PRICE = 50m;
+        private static readonly double PLASTIC_CAPSULE_CONTROL_MULTIPLIER = 0.7;
+        private static readonly int PLASTIC_ENGINE_MIN_THRUST_POWER = 150;
+        private static readonly int PLASTIC_ENGINE_MAX_THRUST_POWER = 200;
+        private static readonly int PLASTIC_TANK_FUEL_CAPACITY = 5000;
+        private static readonly double CARBON_CAPSULE_CONTROL_MULTIPLIER = 1;
+        private static readonly decimal CARBON_MIN_PRICE = 100m;
+        private static readonly decimal CARBON_MAX_PRICE = 1000m;
+        private static readonly int CARBON_ENGINE_MIN_THRUST_POWER = 250;
+        private static readonly int CARBON_ENGINE_MAX_THRUST_POWER = 300;
+        private static readonly int CARBON_TANK_FUEL_CAPACITY = 15000;
 
         public MainWindow()
         {
@@ -73,6 +98,66 @@ namespace Rocket_To_The_Space
             timer.Interval = TimeSpan.FromMilliseconds(1000/240);
             timer.Tick += new EventHandler(Update);
             timer.Start();
+        }
+
+        private void InitializeShop()
+        {
+            for (int i = 0; i < shopSlots.Length; i++)
+            {
+                RocketComponent shopItem = null;
+                int rndType = random.Next(1, 5);
+                if (rndType == 1)
+                {
+                    int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
+                    decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
+                    Image componentTexture = new Image();
+                    BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketBoosters/wooden_booster.png", UriKind.Absolute));
+                    componentTexture.Source = img;
+                    int thrustPower = random.Next(WOOD_MIN_BOOSTER_THRUST_POWER, WOOD_MAX_BOOSTER_THRUST_POWER + 1);
+                    shopItem = new RocketBooster("Wood Booster", weight, price, componentTexture, ((UCGame) currentUC).gameCanvas, thrustPower, WOOD_MAX_ENERGY);
+                } else if (rndType == 2)
+                {
+                    int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
+                    decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
+                    Image componentTexture = new Image();
+                    BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketCapsules/wooden_capsule.png", UriKind.Absolute));
+                    componentTexture.Source = img;
+                    int thrustPower = random.Next(WOOD_MIN_BOOSTER_THRUST_POWER, WOOD_MAX_BOOSTER_THRUST_POWER + 1);
+                    shopItem = new RocketCapsule("Wood Capsule", weight, price, componentTexture, ((UCGame)currentUC).gameCanvas, WOOD_CAPSULE_CONTROL_MULTIPLIER);
+                } else if (rndType == 3)
+                {
+                    int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
+                    decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
+                    Image componentTexture = new Image();
+                    BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketEngine/wooden_engine.png", UriKind.Absolute));
+                    componentTexture.Source = img;
+                    int thrustPower = random.Next(WOOD_ENGINE_MIN_THRUST_POWER, WOOD_ENGINE_MAX_THRUST_POWER + 1);
+                    shopItem = new RocketEngine("Wood Engine", weight, price, componentTexture, ((UCGame)currentUC).gameCanvas, thrustPower);
+                } else if (rndType == 4)
+                {
+                    int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
+                    decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
+                    Image componentTexture = new Image();
+                    BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketTanks/wooden_tank.png", UriKind.Absolute));
+                    componentTexture.Source = img;
+                    int thrustPower = random.Next(WOOD_ENGINE_MIN_THRUST_POWER, WOOD_ENGINE_MAX_THRUST_POWER + 1);
+                    shopItem = new RocketTank("Wood Tank", weight, price, componentTexture, ((UCGame)currentUC).gameCanvas, WOOD_TANK_FUEL_CAPACITY);
+                }
+                ((UCGame)currentUC).gameCanvas.Children.Add(shopItem.Texture);
+                Image texture = new Image();
+                texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot.png", UriKind.Absolute));
+                texture.Width = 48;
+                texture.Height = 48;
+                Image selectedTexture = new Image();
+                selectedTexture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot_selected.png", UriKind.Absolute));
+                ((UCGame)currentUC).gameCanvas.Children.Add(texture);
+                ((UCGame)currentUC).gameCanvas.Children.Add(selectedTexture);
+                selectedTexture.Width = 48;
+                selectedTexture.Height = 48;
+                Slot slot = new Slot(texture, selectedTexture);
+                slot.SetComponent(shopItem);
+                slot.Hide();
+            } 
         }
 
         private void Update(object? sender, EventArgs e)
@@ -126,7 +211,9 @@ namespace Rocket_To_The_Space
                 }
             }
             currentUC = game;
+            InitializeShop();
             InitializeSlots(game);
+            game.shop.Visibility = Visibility.Collapsed;
             mainContentControl.Content = game;
             game.gameCanvas.MouseDown += GameClickHandler;
             game.launchButton.Click += LaunchRocket;
@@ -340,7 +427,7 @@ namespace Rocket_To_The_Space
 
         private void UpdateObstacles()
         {
-            if (currentStage == 4 || currentStage == 5)
+            if (currentStage == 5 || currentStage == 6)
             {
                 int p = random.Next(0,100) ;
                 if (p == 0)
