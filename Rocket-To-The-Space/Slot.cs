@@ -35,6 +35,10 @@ namespace Rocket_To_The_Space
         {
             Image.Visibility = Visibility.Hidden;
             SelectedImage.Visibility = Visibility.Hidden;
+            if (component != null)
+            {
+                component.Texture.Visibility = Visibility.Hidden;
+            }
         }
 
         public void Show()
@@ -51,6 +55,10 @@ namespace Rocket_To_The_Space
 
         public void SetComponent(RocketComponent component)
         {
+            if (this.component != null)
+            {
+                component.Canvas.Children.Remove(component.Texture);
+            }
             this.component = component;
         }
 

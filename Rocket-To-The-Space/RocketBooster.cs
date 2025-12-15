@@ -6,7 +6,7 @@ namespace Rocket_To_The_Space
     {
         public int ThrustPower { get; }
         public int MaxEnergy { get; }
-        public RocketBooster(string name, int weight, int cost, Image texture, Canvas canvas, int thrustPower, int maxEnergy) : base(name, weight, cost, texture, canvas)
+        public RocketBooster(string name, int weight, decimal cost, Image texture, Canvas canvas, int thrustPower, int maxEnergy) : base(name, weight, cost, texture, canvas)
         {
             ThrustPower = thrustPower;
             MaxEnergy = maxEnergy;
