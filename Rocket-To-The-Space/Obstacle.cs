@@ -10,27 +10,32 @@ namespace Rocket_To_The_Space
 {
     internal class Obstacle
     {
-        public ObstacleType type { get; }
+        public ObstacleType Type { get; }
         private Image obstacleImage;
         private int rotationAngle;
         private int x;
         private int y;
         public Obstacle(ObstacleType type, Image obstacleImage)
         {
-            this.type = type;
+            this.Type = type;
             this.obstacleImage = obstacleImage;
         }
 
         public void SetRotationAngle(int angle)
         {
-            if (type != ObstacleType.ASTEROID)
+            if (Type != ObstacleType.ASTEROID)
             {
                 return;
             }
             rotationAngle = angle;
             RotateTransform rotateTransform = new RotateTransform(rotationAngle);
             obstacleImage.RenderTransform = rotateTransform;
-        }   
+        }
+        
+        public int GetRotationAngle()
+        {
+            return rotationAngle;
+        }
 
         public void SetPosition(int x, int y)
         {

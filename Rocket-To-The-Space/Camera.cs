@@ -8,9 +8,9 @@ namespace Rocket_To_The_Space
 {
     internal class Camera
     {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public Camera(int x, int y)
+        public double X { get; set; }
+        public double Y { get; set; }
+        public Camera(double x, double y)
         {
             X = x;
             Y = y;

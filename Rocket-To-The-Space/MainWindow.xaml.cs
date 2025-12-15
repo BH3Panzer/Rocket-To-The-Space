@@ -14,6 +14,18 @@ namespace Rocket_To_The_Space
         private Slot[] slots = new Slot[8];
         public UserControl? currentUC;
         private Slot? lastSelectedSlot;
+        private bool isRocketLaunched = false;
+        private Rocket? rocket;
+        private Camera camera = new Camera(0, 0);
+        private double lastCameraX = 0;
+        private double lastCameraY = 0;
+        private List<Image> decoration = new List<Image>();
+        private int currentStage = 0;
+        private static readonly double BACKGROUND_SPEED_MULTIPLIER = 0.05;
+        private static readonly double DECORATION_SPEED_MULTIPLIER = 0.2;
+        private static readonly Random random = new Random();
+        private Label[] stageCheckpoint = new Label[6];
+        private List<Obstacle> obstacles = new List<Obstacle>();
 
         public MainWindow()
         {
@@ -31,7 +43,6 @@ namespace Rocket_To_The_Space
                 int x = i * 48 + 60;
                 int y = 510;
                 Image texture = new Image();
-                BitmapImage textureBitmap = new BitmapImage();
                 texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot.png", UriKind.Absolute));
                 texture.Width = 48;
                 texture.Height = 48;
@@ -46,6 +57,8 @@ namespace Rocket_To_The_Space
                 Canvas.SetTop(texture, y);
                 Canvas.SetLeft(selectedTexture, x);
                 Canvas.SetTop(selectedTexture, y);
+                Panel.SetZIndex(texture, 3);
+                Panel.SetZIndex(selectedTexture, 3);
                 slots[i] = new Slot(texture, selectedTexture);
 
             }   
@@ -55,8 +68,17 @@ namespace Rocket_To_The_Space
         {
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(1000/240);
-            timer.Tick += UpdateCursor;
+            timer.Tick += new EventHandler(Update);
             timer.Start();
+        }
+
+        private void Update(object? sender, EventArgs e)
+        {
+            UpdateCursor(sender, e);
+            if (currentUC is UCGame)
+            {
+                UpdateGame(sender, e);
+            }
         }
 
         private void UpdateCursor(object? sender, EventArgs e)
@@ -85,12 +107,33 @@ namespace Rocket_To_The_Space
         private void ShowGameScreen(object sender, RoutedEventArgs e)
         {
             UCGame game = new UCGame();
+            int i = 0;
+            foreach (UIElement obj in game.gameCanvas.Children)
+            {
+                if (obj is Label)
+                {
+                    stageCheckpoint[i] = (Label) obj;
+                    i++;
+                }
+            }
             currentUC = game;
             InitializeSlots(game);
             mainContentControl.Content = game;
             game.gameCanvas.MouseDown += GameClickHandler;
+            game.launchButton.Click += LaunchRocket;
             mainWindow.KeyDown += GameKeyPressHandler;
-            timer.Tick += UpdateGame;
+            rocket = new Rocket();
+        }
+
+        private void LaunchRocket(object sender, RoutedEventArgs e)
+        {
+            //TODO: Check if rocket is ready to launch
+            isRocketLaunched = true;
+            currentStage = 1;
+            foreach (Slot slot in slots)
+            {
+                slot.Hide();
+            }
         }
 
         private void GameClickHandler(object sender, MouseButtonEventArgs e)
@@ -99,7 +142,7 @@ namespace Rocket_To_The_Space
             if (GetSelectedSlot(out slotClicked))
             {
                SelectSlot(slotClicked);
-            } else
+            } else if (!isRocketLaunched)
             {
                 lastSelectedSlot?.Deselect();
             }
@@ -129,9 +172,164 @@ namespace Rocket_To_The_Space
             lastSelectedSlot = slot;
         }  
 
+        private void CreateCloud(int x, double y)
+        {
+            BitmapImage cloud = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/cloud_decoration.png", UriKind.Absolute));
+            Image cloudImg = new Image();
+            cloudImg.Source = cloud;
+            cloudImg.Width = 64;
+            cloudImg.Height = 64;
+            cloudImg.Tag = "decoration_cloud";
+            if (currentUC is UCGame)
+            {
+                ((UCGame)currentUC).gameCanvas.Children.Add(cloudImg);
+            }
+            Canvas.SetLeft(cloudImg, x);
+            Canvas.SetTop(cloudImg, y);
+            Panel.SetZIndex(cloudImg, 1);
+            decoration.Add(cloudImg);
+
+        }
+
+        private void CreateAsteroid(int x, double y)
+        {
+            BitmapImage asteroid = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/asteroid.png", UriKind.Absolute));
+            Image asteroidImg = new Image();
+            asteroidImg.Source = asteroid;
+            asteroidImg.Width = 64;
+            asteroidImg.Height = 64;
+            Obstacle asteroidObstacle = new Obstacle(ObstacleType.ASTEROID, asteroidImg);
+            ((UCGame)currentUC).gameCanvas.Children.Add(asteroidImg);
+            Canvas.SetLeft(asteroidImg, x);
+            Canvas.SetTop(asteroidImg, y);
+            obstacles.Add(asteroidObstacle);
+
+        }
+
+        private void UpdateRocket()
+        {
+            if (!isRocketLaunched)
+            {
+                return;
+            }
+            camera.Y -= rocket.Speed; 
+        }
+
+        private void UpdateCamera()
+        {
+            if (currentUC is UCGame)
+            {
+                double deltaX = camera.X - lastCameraX;
+                double deltaY = camera.Y - lastCameraY;
+                lastCameraX = camera.X;
+                lastCameraY = camera.Y;
+                foreach (UIElement obj in ((UCGame)currentUC).gameCanvas.Children)
+                {
+                    if (obj is Image)
+                    {
+                        Image image = (Image)obj;
+                        double left = Canvas.GetLeft(image);
+                        double top = Canvas.GetTop(image);
+                        double localDeltaX = deltaX;
+                        double localDeltaY = deltaY;
+                        if (Panel.GetZIndex(obj) == 0)
+                        {
+                            localDeltaX *= BACKGROUND_SPEED_MULTIPLIER;
+                            localDeltaY *= BACKGROUND_SPEED_MULTIPLIER;
+                        }
+
+                        if (Panel.GetZIndex(obj) == 1)
+                        {
+                            localDeltaX *= DECORATION_SPEED_MULTIPLIER;
+                            localDeltaY *= DECORATION_SPEED_MULTIPLIER;
+                        }
+                        Canvas.SetLeft(image, left - localDeltaX);
+                        Canvas.SetTop(image, top - localDeltaY);
+                    }
+                    if (obj is Label)
+                    {
+                        Label label = (Label)obj;
+                        double left = Canvas.GetLeft(label);
+                        double top = Canvas.GetTop(label);
+                        Canvas.SetLeft(label, left - deltaX * BACKGROUND_SPEED_MULTIPLIER);
+                        Canvas.SetTop(label, top - deltaY * BACKGROUND_SPEED_MULTIPLIER);
+                    }
+                }
+            }
+        }
+
+        private void UpdateDecoration()
+        {
+            if (currentStage == 1)
+            {
+                int p = random.Next(0,100);
+                if (p == 0)
+                {
+                    int x = random.Next(0, (int)mainWindow.ActualWidth);
+                    double y = camera.Y;
+                    CreateCloud(x, y);
+                }
+                List<Image> cloudToRemove = new List<Image>();
+                foreach (Image cloud in decoration)
+                {
+       
+                    if (Canvas.GetTop(cloud) >= ((UCGame)currentUC).gameCanvas.ActualHeight)
+                    {
+                        cloudToRemove.Add(cloud);
+                        if (currentUC is UCGame)
+                        {
+                            ((UCGame)currentUC).gameCanvas.Children.Remove(cloud);
+                        }
+                    }
+                }
+                foreach (Image cloud in cloudToRemove)
+                {
+                    decoration.Remove(cloud);
+                }
+            }
+        }
+
+        private void UpdateCurrentStage()
+        {
+            if (currentStage == 7 || currentStage == 0)
+            {
+                return;
+            }
+            if (Canvas.GetTop(stageCheckpoint[currentStage - 1]) + mainWindow.ActualHeight  >= mainWindow.ActualHeight)
+            {
+                currentStage++;
+            }
+        }
+
+        private void UpdateObstacles()
+        {
+            if (currentStage == 4 || currentStage == 5)
+            {
+                int p = random.Next(0, 25);
+                if (p == 0)
+                {
+                    double y = camera.Y;
+                    int x = random.Next(0, (int)mainWindow.ActualWidth);
+                    CreateAsteroid(x, y);
+                }
+            }
+
+            foreach (Obstacle obstacle in obstacles)
+            {
+                if (obstacle.Type == ObstacleType.ASTEROID)
+                {
+                    obstacle.SetRotationAngle(obstacle.GetRotationAngle() + 1);
+                }
+            }
+        }
+
         private void UpdateGame(object? sender, EventArgs e)
         {
-            
+            UpdateRocket();
+            UpdateDecoration();
+            UpdateCurrentStage();
+            UpdateObstacles();
+            UpdateCamera();
         }
 
         private bool GetSelectedSlot(out Slot selectedSlot)

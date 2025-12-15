@@ -7,6 +7,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="609" d:DesignWidth="520">
     <Canvas x:Name="gameCanvas" Width="520" Height="609" HorizontalAlignment="Left" VerticalAlignment="Top">
-        <Rectangle Fill="White" Width="520" Height="609"/>
+        <Image x:Name="bg" x:Uid="bg" Source="pack://application:,,,/Assets/Img/bg.png" Canvas.Left="0" Canvas.Top="-64965" StretchDirection="UpOnly" Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Center" MinWidth="520" Width="360"/>
+        <Button x:Name="launchButton" Content="Launch" Canvas.Left="206" Canvas.Top="10" HorizontalAlignment="Left" VerticalAlignment="Center" Panel.ZIndex="3"/>
+        <Label Content="stage 2" x:Uid="stage2" Canvas.Left="265" Canvas.Top="-5316" FontSize="100"/>
+        <Label Content="stage 3" x:Uid="stage3" Canvas.Left="246" Canvas.Top="-29858" FontSize="100"/>
+        <Label Content="stage 4" x:Uid="stage4" Canvas.Left="265" Canvas.Top="-45008" FontSize="100"/>
+        <Label Content="stage 5" x:Uid="stage5" Canvas.Left="236" Canvas.Top="-49590" FontSize="100"/>
+        <Label Content="stage 6" x:Uid="stage6" Canvas.Left="227" Canvas.Top="-62820" FontSize="100"/>
+        <Label Content="stage end" x:Uid="stageEnd" Canvas.Left="227" Canvas.Top="-64965" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="100"/>
     </Canvas>
 </UserControl>
