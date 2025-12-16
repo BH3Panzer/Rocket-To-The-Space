@@ -70,31 +70,33 @@ namespace Rocket_To_The_Space
 
         private void InitializeButtons()
         {
-            sellButton.Content = "Sell";
-            sellButton.Width = 80;
+            sellButton.Content = "Vendre";
+            sellButton.Width = 90;
             sellButton.Height = 40;
             Panel.SetZIndex(sellButton, 3);
             sellButton.Click += SellButtonClickHandler;
             sellButton.HorizontalAlignment = HorizontalAlignment.Left;
             sellButton.VerticalAlignment = VerticalAlignment.Top;
             sellButton.FontSize = 16;
+            sellButton.IsEnabled = false;
 
-            addToRocketButton.Content = "Add";
-            addToRocketButton.Width = 80;
+            addToRocketButton.Content = "Ajouter";
+            addToRocketButton.Width = 90;
             addToRocketButton.Height = 40;
             Panel.SetZIndex(addToRocketButton, 3);
             addToRocketButton.Click += AddToRocketButtonClickHandler;
             addToRocketButton.HorizontalAlignment = HorizontalAlignment.Left;
             addToRocketButton.VerticalAlignment = VerticalAlignment.Top;
             addToRocketButton.FontSize = 16;
+            addToRocketButton.IsEnabled = false;
 
 
             ((UCGame)currentUC).gameCanvas.Children.Add(sellButton);
             Canvas.SetLeft(sellButton, 5);
-            Canvas.SetTop(sellButton, 500);
+            Canvas.SetTop(sellButton, 450);
             ((UCGame)currentUC).gameCanvas.Children.Add(addToRocketButton);
             Canvas.SetLeft(addToRocketButton, 5);
-            Canvas.SetTop(addToRocketButton, 455);
+            Canvas.SetTop(addToRocketButton, 400);
         }
 
         private void AddToRocketButtonClickHandler(object sender, RoutedEventArgs e)
@@ -124,13 +126,10 @@ namespace Rocket_To_The_Space
                 selectedTexture.Height = 48;
                 selectedTexture.Visibility = Visibility.Hidden;
                 ucGame.gameCanvas.Children.Add(selectedTexture);
-                Canvas.SetLeft(texture, x);
-                Canvas.SetTop(texture, y);
-                Canvas.SetLeft(selectedTexture, x);
-                Canvas.SetTop(selectedTexture, y);
                 Panel.SetZIndex(texture, 3);
                 Panel.SetZIndex(selectedTexture, 3);
-                slots[i] = new Slot(texture, selectedTexture);
+                slots[i] = new Slot(texture, selectedTexture, x, y);
+                slots[i].Draw();
 
             }   
         }
@@ -197,7 +196,7 @@ namespace Rocket_To_The_Space
                 ((UCGame)currentUC).gameCanvas.Children.Add(selectedTexture);
                 selectedTexture.Width = 48;
                 selectedTexture.Height = 48;
-                Slot slot = new Slot(texture, selectedTexture);
+                Slot slot = new Slot(texture, selectedTexture, 0, 0);
                 slot.SetComponent(shopItem);
                 slot.Hide();
             } 
@@ -264,7 +263,7 @@ namespace Rocket_To_The_Space
             mainWindow.KeyDown += GameKeyPressHandler;
             rocket = new Rocket();
             rocket.Init(game);
-            rocket.Show(game, camera);
+            rocket.Draw(camera);
 #if DEBUG
             mainWindow.KeyDown += DebugKeyHandler;
         }
@@ -303,6 +302,8 @@ namespace Rocket_To_The_Space
             }
             UCGame game = (UCGame)currentUC;
             game.launchButton.Visibility = Visibility.Hidden;
+            addToRocketButton.Visibility = Visibility.Hidden;
+            sellButton.Visibility = Visibility.Hidden;
 
         }
 
@@ -311,10 +312,23 @@ namespace Rocket_To_The_Space
             Slot slotClicked;
             if (GetSelectedSlot(out slotClicked))
             {
-               SelectSlot(slotClicked);
-            } else if (!isRocketLaunched)
+                SelectSlot(slotClicked);
+                if (slotClicked.GetRocketComponent() != null)
+                {
+                    addToRocketButton.IsEnabled = true;
+                    sellButton.IsEnabled = true;
+                }
+                else
+                {
+                    addToRocketButton.IsEnabled = false;
+                    sellButton.IsEnabled = false;
+                }
+            }
+            else if (!isRocketLaunched)
             {
                 lastSelectedSlot?.Deselect();
+                addToRocketButton.IsEnabled = false;
+                sellButton.IsEnabled = false;
             }
         }
 
@@ -384,8 +398,8 @@ namespace Rocket_To_The_Space
                 return;
             }
             rocket.Update();
-            rocket.Show((UCGame)currentUC, camera);
-            camera.Y -= rocket.Speed;
+            rocket.Draw(camera);
+            camera.Y = (rocket.Y + rocket.RocketBox.ActualHeight + 90) - ((UCGame)currentUC).gameCanvas.Height;
         }
 
         private void UpdateCamera()
@@ -547,6 +561,13 @@ namespace Rocket_To_The_Space
         {
             return new RectangleGeometry(
                 new Rect(0, 0, e.ActualWidth, e.ActualHeight));
+        }
+
+        private void generateBaseInventory()
+        {
+            if (launchCount == 0)
+            {
+            }
         }
 
         bool IsColliding(FrameworkElement a, FrameworkElement b)

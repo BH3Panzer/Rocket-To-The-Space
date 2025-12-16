@@ -38,13 +38,35 @@ namespace Rocket_To_The_Space
 
         public void Update()
         {
+            UpdateStats();
             this.Y -= this.Speed;
         }
 
-        public void Show(UCGame uc, Camera cam)
+        public void Draw(Camera cam)
         {
             Canvas.SetTop(this.RocketBox, this.Y - cam.Y);
             Canvas.SetLeft(this.RocketBox, this.X - cam.X);
+        }
+
+        public void UpdateStats()
+        {
+            Speed = 0;
+            foreach (var component in Components)
+            {
+                if (component is RocketEngine engine)
+                {
+                    Speed += engine.ThrustPower;
+                }
+                else if (component is RocketBooster booster)
+                {
+                    Speed += booster.ThrustPower;
+                }
+            }
+
+            foreach (var component in Components)
+            {
+                Speed -= component.Weight;
+            }
         }
     }
 }
