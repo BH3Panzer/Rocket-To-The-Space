@@ -102,6 +102,8 @@ namespace Rocket_To_The_Space
 
         private void InitializeShop()
         {
+            double slotX = 0;
+            double slotY = 0;
             for (int i = 0; i < shopSlots.Length; i++)
             {
                 RocketComponent shopItem = null;
@@ -111,6 +113,8 @@ namespace Rocket_To_The_Space
                     int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
                     decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
                     Image componentTexture = new Image();
+                    componentTexture.Width = 16;
+                    componentTexture.Height = 32;
                     BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketBoosters/wooden_booster.png", UriKind.Absolute));
                     componentTexture.Source = img;
                     int thrustPower = random.Next(WOOD_MIN_BOOSTER_THRUST_POWER, WOOD_MAX_BOOSTER_THRUST_POWER + 1);
@@ -120,6 +124,8 @@ namespace Rocket_To_The_Space
                     int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
                     decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
                     Image componentTexture = new Image();
+                    componentTexture.Width = 32;
+                    componentTexture.Height = 32;
                     BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketCapsules/wooden_capsule.png", UriKind.Absolute));
                     componentTexture.Source = img;
                     int thrustPower = random.Next(WOOD_MIN_BOOSTER_THRUST_POWER, WOOD_MAX_BOOSTER_THRUST_POWER + 1);
@@ -129,6 +135,8 @@ namespace Rocket_To_The_Space
                     int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
                     decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
                     Image componentTexture = new Image();
+                    componentTexture.Width = 32;
+                    componentTexture.Height = 32;
                     BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketEngine/wooden_engine.png", UriKind.Absolute));
                     componentTexture.Source = img;
                     int thrustPower = random.Next(WOOD_ENGINE_MIN_THRUST_POWER, WOOD_ENGINE_MAX_THRUST_POWER + 1);
@@ -138,25 +146,52 @@ namespace Rocket_To_The_Space
                     int weight = random.Next(WOOD_MIN_WEIGHT, WOOD_MAX_WEIGHT + 1);
                     decimal price = WOOD_MIN_PRICE + (decimal)(random.NextDouble()) * (WOOD_MAX_PRICE - WOOD_MIN_PRICE);
                     Image componentTexture = new Image();
+                    componentTexture.Width = 32;
+                    componentTexture.Height = 32;
                     BitmapImage img = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketTanks/wooden_tank.png", UriKind.Absolute));
                     componentTexture.Source = img;
                     int thrustPower = random.Next(WOOD_ENGINE_MIN_THRUST_POWER, WOOD_ENGINE_MAX_THRUST_POWER + 1);
                     shopItem = new RocketTank("Wood Tank", weight, price, componentTexture, ((UCGame)currentUC).gameCanvas, WOOD_TANK_FUEL_CAPACITY);
                 }
-                ((UCGame)currentUC).gameCanvas.Children.Add(shopItem.Texture);
                 Image texture = new Image();
                 texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot.png", UriKind.Absolute));
                 texture.Width = 48;
                 texture.Height = 48;
                 Image selectedTexture = new Image();
                 selectedTexture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/inventory_slot_selected.png", UriKind.Absolute));
-                ((UCGame)currentUC).gameCanvas.Children.Add(texture);
-                ((UCGame)currentUC).gameCanvas.Children.Add(selectedTexture);
+                ((UCGame)currentUC).shop.Children.Add(texture);
+                ((UCGame)currentUC).shop.Children.Add(selectedTexture);
+                ((UCGame)currentUC).shop.Children.Add(shopItem.Texture);
+                texture.HorizontalAlignment = HorizontalAlignment.Left;
+                texture.VerticalAlignment = VerticalAlignment.Top;
+                selectedTexture.HorizontalAlignment = HorizontalAlignment.Left;
+                selectedTexture.VerticalAlignment = VerticalAlignment.Top;
+                shopItem.Texture.HorizontalAlignment = HorizontalAlignment.Left;
+                shopItem.Texture.VerticalAlignment = VerticalAlignment.Top;
+                Canvas.SetLeft(texture, slotX);
+                Canvas.SetLeft(selectedTexture, slotX);
+                Canvas.SetTop(texture, slotY);
+                Canvas.SetLeft(shopItem.Texture, (texture.Width / 2 - shopItem.Texture.Width / 2) + Canvas.GetLeft(texture));
+                Canvas.SetTop(shopItem.Texture, (texture.Height / 2 - shopItem.Texture.Height / 2) + Canvas.GetTop(texture));
+                Canvas.SetTop(selectedTexture, slotY);
+                Canvas.SetTop(shopItem.Texture, slotY); 
+                Canvas.SetZIndex(texture, 3);
+                Canvas.SetZIndex(selectedTexture, 3);
+                Canvas.SetZIndex(shopItem.Texture, 3);
                 selectedTexture.Width = 48;
                 selectedTexture.Height = 48;
+
                 Slot slot = new Slot(texture, selectedTexture);
+                Console.WriteLine($"slot x : {slotX} slotY : {slotY}");
                 slot.SetComponent(shopItem);
-                slot.Hide();
+                slot.Deselect();
+                slotX += 48;
+                if ((i + 1) % 4 == 0)
+                {
+                    slotY += 48;
+                    slotX = 0;
+                }
+                shopSlots[i] = slot;
             } 
         }
 
@@ -213,7 +248,7 @@ namespace Rocket_To_The_Space
             currentUC = game;
             InitializeShop();
             InitializeSlots(game);
-            game.shop.Visibility = Visibility.Collapsed;
+            //game.shop.Visibility = Visibility.Collapsed;
             mainContentControl.Content = game;
             game.gameCanvas.MouseDown += GameClickHandler;
             game.launchButton.Click += LaunchRocket;

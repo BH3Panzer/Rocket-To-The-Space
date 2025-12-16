@@ -8,8 +8,8 @@ namespace Rocket_To_The_Space
         public int Weight { get; private set; }
         public decimal Cost { get; set; }
         public Image Texture { get;}
-        private int x;
-        private int y;
+        public int X { get; private set; }
+        public int Y { get; private set; }
         public Canvas Canvas;
         protected RocketComponent(string name, int weight, decimal cost, Image texture, Canvas canvas)
         {
@@ -17,13 +17,7 @@ namespace Rocket_To_The_Space
             Weight = weight;
             Cost = cost;
             Texture = texture;
-            this.Canvas = canvas;
-        }
-
-        public void SetX(int newX)
-        {
-            x = newX;
-
+            Canvas = canvas;
         }
     }
 }
