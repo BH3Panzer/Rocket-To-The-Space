@@ -9,11 +9,15 @@ namespace Rocket_To_The_Space
         public Image SelectedImage { get; }
         private RocketComponent? component;
         private bool isSelected;
-        public Slot(Image image, Image selectedImage)
+        public double X { get; set; }
+        public double Y { get; set; }
+        public Slot(Image image, Image selectedImage, double x, double y)
         {
             Image = image;
             SelectedImage = selectedImage;
             isSelected = false;
+            X = x;
+            Y = y;
         }
 
         public void Select()
@@ -69,6 +73,20 @@ namespace Rocket_To_The_Space
         public bool IsEmpty()
         {
             return component == null;
+        }
+
+        public void Draw()
+        {
+            Canvas.SetLeft(Image, X);
+            Canvas.SetTop(Image, Y);
+            Canvas.SetLeft(SelectedImage, X);
+            Canvas.SetTop(SelectedImage, Y);
+            if (component != null)
+            {
+                component.SetX((Image.Width - component.Texture.Width) / 2 + X);
+                component.SetY((Image.Height - component.Texture.Height) / 2 + Y);
+                component.Draw();
+            }
         }
     }
 }

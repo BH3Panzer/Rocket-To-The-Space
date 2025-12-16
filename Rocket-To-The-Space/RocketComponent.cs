@@ -9,8 +9,9 @@ namespace Rocket_To_The_Space
         public int Weight { get; private set; }
         public decimal Cost { get; set; }
         public Image Texture { get;}
-        public int X { get; private set; }
-        public int Y { get; private set; }
+        public double X { get; private set; }
+        public double Y { get; private set; }
+
         public Canvas Canvas;
         protected RocketComponent(string name, int weight, decimal cost, Image texture, Canvas canvas)
         {
@@ -21,6 +22,7 @@ namespace Rocket_To_The_Space
             Canvas = canvas;
         }
 
+
         public override bool Equals(object? obj)
         {
             RocketComponent? otherComponent = obj as RocketComponent;
@@ -28,5 +30,26 @@ namespace Rocket_To_The_Space
         }
 
         public abstract RocketComponent Clone();
+        public void SetX(double newX)
+        {
+            this.X = newX;
+        }
+
+        public void SetY(double newY)
+        {
+            this.Y = newY;
+        }
+
+        public void Draw(Camera cam)
+        {
+            Canvas.SetTop(this.Texture, this.Y - cam.Y);
+            Canvas.SetLeft(this.Texture, this.X - cam.X);
+        }
+
+        public void Draw()
+        {
+            Canvas.SetTop(this.Texture, this.Y);
+            Canvas.SetLeft(this.Texture, this.X);
+        }
     }
 }

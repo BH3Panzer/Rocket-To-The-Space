@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Linq;
 namespace Rocket_To_The_Space
@@ -31,6 +32,7 @@ namespace Rocket_To_The_Space
         private double[] initialStageCheckpointY = new double[6];
         private List<Obstacle> obstacles = new List<Obstacle>();
         private MediaPlayer mediaPlayer = new MediaPlayer();
+        private uint launchCount = 0;
         private Slot[] shopSlots = new Slot[8];
         private Slot lastSelectedShopSlot;
         private bool isShopOpened = false;
@@ -83,6 +85,8 @@ namespace Rocket_To_The_Space
             {"PLASTIC", 5000 },
             {"CARBON", 15000 }
         };
+        private Button sellButton = new Button();
+        private Button addToRocketButton = new Button();
 
         public MainWindow()
         {
@@ -91,6 +95,47 @@ namespace Rocket_To_The_Space
             Cursor = Cursors.None;
             cursor.IsHitTestVisible = false;
             ShowMainMenu();
+        }
+
+        private void InitializeButtons()
+        {
+            sellButton.Content = "Vendre";
+            sellButton.Width = 90;
+            sellButton.Height = 40;
+            Panel.SetZIndex(sellButton, 3);
+            sellButton.Click += SellButtonClickHandler;
+            sellButton.HorizontalAlignment = HorizontalAlignment.Left;
+            sellButton.VerticalAlignment = VerticalAlignment.Top;
+            sellButton.FontSize = 16;
+            sellButton.IsEnabled = false;
+
+            addToRocketButton.Content = "Ajouter";
+            addToRocketButton.Width = 90;
+            addToRocketButton.Height = 40;
+            Panel.SetZIndex(addToRocketButton, 3);
+            addToRocketButton.Click += AddToRocketButtonClickHandler;
+            addToRocketButton.HorizontalAlignment = HorizontalAlignment.Left;
+            addToRocketButton.VerticalAlignment = VerticalAlignment.Top;
+            addToRocketButton.FontSize = 16;
+            addToRocketButton.IsEnabled = false;
+
+
+            ((UCGame)currentUC).gameCanvas.Children.Add(sellButton);
+            Canvas.SetLeft(sellButton, 5);
+            Canvas.SetTop(sellButton, 450);
+            ((UCGame)currentUC).gameCanvas.Children.Add(addToRocketButton);
+            Canvas.SetLeft(addToRocketButton, 5);
+            Canvas.SetTop(addToRocketButton, 400);
+        }
+
+        private void AddToRocketButtonClickHandler(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void SellButtonClickHandler(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         private void InitializeSlots(UCGame ucGame)
@@ -110,13 +155,10 @@ namespace Rocket_To_The_Space
                 selectedTexture.Height = 48;
                 selectedTexture.Visibility = Visibility.Hidden;
                 ucGame.gameCanvas.Children.Add(selectedTexture);
-                Canvas.SetLeft(texture, x);
-                Canvas.SetTop(texture, y);
-                Canvas.SetLeft(selectedTexture, x);
-                Canvas.SetTop(selectedTexture, y);
                 Panel.SetZIndex(texture, 3);
                 Panel.SetZIndex(selectedTexture, 3);
-                slots[i] = new Slot(texture, selectedTexture);
+                slots[i] = new Slot(texture, selectedTexture, x, y);
+                slots[i].Draw();
 
             }   
         }
@@ -223,19 +265,14 @@ namespace Rocket_To_The_Space
                 selectedTexture.VerticalAlignment = VerticalAlignment.Top;
                 shopItem.Texture.HorizontalAlignment = HorizontalAlignment.Left;
                 shopItem.Texture.VerticalAlignment = VerticalAlignment.Top;
-                Canvas.SetLeft(texture, slotX);
-                Canvas.SetLeft(selectedTexture, slotX);
-                Canvas.SetTop(texture, slotY);
                 Canvas.SetLeft(shopItem.Texture, (texture.Width - shopItem.Texture.Width) / 2 + slotX);
                 Canvas.SetTop(shopItem.Texture, (texture.Height - shopItem.Texture.Height) / 2 + slotY);
-                Canvas.SetTop(selectedTexture, slotY);
                 Canvas.SetZIndex(texture, 3);
                 Canvas.SetZIndex(selectedTexture, 3);
                 Canvas.SetZIndex(shopItem.Texture, 3);
                 selectedTexture.Width = 48;
                 selectedTexture.Height = 48;
-
-                Slot slot = new Slot(texture, selectedTexture);
+                Slot slot = new Slot(texture, selectedTexture, slotX, slotY);
                 slot.SetComponent(shopItem);
                 slot.Deselect();
                 slotX += 48;
@@ -245,6 +282,7 @@ namespace Rocket_To_The_Space
                     slotX = (game.shop.Width - 48 * 4) / 4;
                 }
                 shopSlots[i] = slot;
+                shopSlots[i].Draw();
             }
             game.buyButton.Click += Buy;
             game.closeShopButton.Click += CloseShop;
@@ -305,6 +343,7 @@ namespace Rocket_To_The_Space
             mainContentControl.Content = mainMenu;
             mainMenu.PlayButton.Click += ShowRuleScreen;
             mediaPlayer.Open(new Uri("Assets/Music/BH3Panzer - To the Space.mp3", UriKind.Relative));
+            mediaPlayer.Volume = 0.5;
             mediaPlayer.Play();
         }
 
@@ -314,14 +353,13 @@ namespace Rocket_To_The_Space
             currentUC = gameRules;
             mainContentControl.Content = gameRules;
             gameRules.startButton.Click += ShowGameScreen;
+            mediaPlayer.Stop();
         }
 
         private void ShowGameScreen(object sender, RoutedEventArgs e)
         {
             UCGame game = new UCGame();
             int i = 0;
-
-            mediaPlayer.Stop();
 
             foreach (UIElement obj in game.gameCanvas.Children)
             {
@@ -339,6 +377,7 @@ namespace Rocket_To_The_Space
             currentUC = game;
             resetShop(1, 1);
             InitializeSlots(game);
+            InitializeButtons();
             game.shop.Visibility = Visibility.Collapsed;
             //game.shop.Visibility = Visibility.Collapsed;
             mainContentControl.Content = game;
@@ -346,6 +385,8 @@ namespace Rocket_To_The_Space
             game.launchButton.Click += LaunchRocket;
             mainWindow.KeyDown += GameKeyPressHandler;
             rocket = new Rocket();
+            rocket.Init(game);
+            rocket.Draw(camera);
 #if DEBUG
             mainWindow.KeyDown += DebugKeyHandler;
         }
@@ -376,6 +417,7 @@ namespace Rocket_To_The_Space
         {
             //TODO: Check if rocket is ready to launch
             isRocketLaunched = true;
+            launchCount++;
             currentStage = 1;
             foreach (Slot slot in slots)
             {
@@ -383,6 +425,8 @@ namespace Rocket_To_The_Space
             }
             UCGame game = (UCGame)currentUC;
             game.launchButton.Visibility = Visibility.Hidden;
+            addToRocketButton.Visibility = Visibility.Hidden;
+            sellButton.Visibility = Visibility.Hidden;
 
         }
 
@@ -391,10 +435,23 @@ namespace Rocket_To_The_Space
             Slot slotClicked;
             if (GetHoveredSlot(out slotClicked, slots, mainCanvas))
             {
-               SelectSlot(slotClicked, ref lastSelectedSlot);
-            } else if (!isRocketLaunched)
+                SelectSlot(slotClicked, ref lastSelectedSlot);
+                if (slotClicked.GetRocketComponent() != null)
+                {
+                    addToRocketButton.IsEnabled = true;
+                    sellButton.IsEnabled = true;
+                }
+                else
+                {
+                    addToRocketButton.IsEnabled = false;
+                    sellButton.IsEnabled = false;
+                }
+            }
+            else if (!isRocketLaunched)
             {
                 lastSelectedSlot?.Deselect();
+                addToRocketButton.IsEnabled = false;
+                sellButton.IsEnabled = false;
             }
             if (GetHoveredSlot(out slotClicked, shopSlots, ((UCGame) currentUC).shop))
             {
@@ -472,7 +529,9 @@ namespace Rocket_To_The_Space
             {
                 return;
             }
-            camera.Y -= rocket.Speed; 
+            rocket.Update();
+            rocket.Draw(camera);
+            camera.Y = (rocket.Y + rocket.RocketBox.ActualHeight + 90) - ((UCGame)currentUC).gameCanvas.Height;
         }
 
         private void UpdateCamera()
@@ -513,6 +572,16 @@ namespace Rocket_To_The_Space
                         double top = Canvas.GetTop(label);
                         Canvas.SetLeft(label, left - deltaX * BACKGROUND_SPEED_MULTIPLIER);
                         Canvas.SetTop(label, top - deltaY * BACKGROUND_SPEED_MULTIPLIER);
+                    }
+                    if (obj is Rectangle)
+                    { 
+                        Rectangle rec = (Rectangle)obj;
+                        double left = Canvas.GetLeft(rec);
+                        double top = Canvas.GetTop(rec);
+                        double localDeltaX = deltaX;
+                        double localDeltaY = deltaY;
+                        Canvas.SetLeft(rec, left - localDeltaX);
+                        Canvas.SetTop(rec, top - localDeltaY);
                     }
                 }
             }
@@ -721,6 +790,13 @@ namespace Rocket_To_The_Space
         {
             return new RectangleGeometry(
                 new Rect(0, 0, e.ActualWidth, e.ActualHeight));
+        }
+
+        private void generateBaseInventory()
+        {
+            if (launchCount == 0)
+            {
+            }
         }
 
         bool IsColliding(FrameworkElement a, FrameworkElement b)

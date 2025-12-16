@@ -60,13 +60,19 @@
     <Resource Include="Assets\Img\RocketBoosters\wooden_booster.png" />
     <Resource Include="Assets\Img\RocketCapsules\carbon_capsule.png" />
     <Resource Include="Assets\Img\RocketCapsules\plastic_capsule.png" />
-    <Resource Include="Assets\Img\RocketCapsules\wooden_capsule.png" />
+    <Resource Include="Assets\Img\RocketCapsules\wooden_capsule.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\Img\RocketEngine\carbon_engine.png" />
     <Resource Include="Assets\Img\RocketEngine\plastic_engine.png" />
-    <Resource Include="Assets\Img\RocketEngine\wooden_engine.png" />
+    <Resource Include="Assets\Img\RocketEngine\wooden_engine.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\Img\RocketTanks\carbon_tank.png" />
     <Resource Include="Assets\Img\RocketTanks\plastic_tank.png" />
-    <Resource Include="Assets\Img\RocketTanks\wooden_tank.png" />
+    <Resource Include="Assets\Img\RocketTanks\wooden_tank.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Assets\Img\rules.png" />
     <Resource Include="Assets\Img\starting_point.png" />
     <Resource Include="Assets\Img\UFO.png" />
