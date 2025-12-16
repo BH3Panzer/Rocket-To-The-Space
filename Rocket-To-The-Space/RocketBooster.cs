@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Media.Animation;
 
 namespace Rocket_To_The_Space
 {
@@ -10,6 +11,17 @@ namespace Rocket_To_The_Space
         {
             ThrustPower = thrustPower;
             MaxEnergy = maxEnergy;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            RocketBooster? otherBooster = obj as RocketBooster; 
+            return base.Equals(obj) && otherBooster?.ThrustPower == ThrustPower && otherBooster?.MaxEnergy == MaxEnergy;
+        }
+
+        public override RocketBooster Clone()
+        {
+            return new RocketBooster(Name, Weight, Cost, Utils.GetCopy(Texture), Canvas, ThrustPower, MaxEnergy);
         }
     }
 }

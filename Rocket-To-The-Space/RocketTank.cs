@@ -10,5 +10,16 @@ namespace Rocket_To_The_Space
         {
             this.FuelCapacity = fuelCapacity;
         }
+
+        public override bool Equals(object? obj)
+        {
+            RocketTank? otherTank = obj as RocketTank;
+            return base.Equals(obj) && otherTank.FuelCapacity == FuelCapacity;
+        }
+
+        public override RocketComponent Clone()
+        {
+            return new RocketTank(Name, Weight, Cost, Utils.GetCopy(Texture), Canvas, FuelCapacity);
+        }
     }
 }

@@ -9,5 +9,16 @@ namespace Rocket_To_The_Space
         {
             ThrustPower = thrustPower;
         }
+
+        public override bool Equals(object? obj)
+        {
+            RocketEngine? otherEngine = obj as RocketEngine;
+            return base.Equals(obj) && otherEngine.ThrustPower == ThrustPower;
+        }
+
+        public override RocketEngine Clone()
+        {
+            return new RocketEngine(Name, Weight, Cost, Utils.GetCopy(Texture), Canvas, ThrustPower);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Security.RightsManagement;
+using System.Windows.Controls;
 
 namespace Rocket_To_The_Space
 {
@@ -19,5 +20,13 @@ namespace Rocket_To_The_Space
             Texture = texture;
             Canvas = canvas;
         }
+
+        public override bool Equals(object? obj)
+        {
+            RocketComponent? otherComponent = obj as RocketComponent;
+            return otherComponent?.Name == Name && otherComponent?.Weight == Weight && otherComponent?.Cost == Cost;
+        }
+
+        public abstract RocketComponent Clone();
     }
 }

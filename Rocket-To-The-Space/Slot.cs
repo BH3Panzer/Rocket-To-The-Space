@@ -8,7 +8,6 @@ namespace Rocket_To_The_Space
         public Image Image { get;}
         public Image SelectedImage { get; }
         private RocketComponent? component;
-        private int componentQuantity;
         private bool isSelected;
         public Slot(Image image, Image selectedImage)
         {
@@ -57,7 +56,7 @@ namespace Rocket_To_The_Space
         {
             if (this.component != null)
             {
-                component.Canvas.Children.Remove(component.Texture);
+                this.component.Canvas.Children.Remove(this.component.Texture);
             }
             this.component = component;
         }
@@ -67,14 +66,9 @@ namespace Rocket_To_The_Space
             return component;
         }
 
-        public void SetQuantity(int quantity)
+        public bool IsEmpty()
         {
-            componentQuantity = quantity;
-        }
-
-        public int GetQuantity()
-        {
-            return componentQuantity;
+            return component == null;
         }
     }
 }

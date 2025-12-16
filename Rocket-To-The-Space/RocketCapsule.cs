@@ -10,5 +10,16 @@ namespace Rocket_To_The_Space
             this.ControlMultiplier = controlMultiplier;
 
         }
+
+        public override bool Equals(object? obj)
+        {
+            RocketCapsule? otherCapsule = obj as RocketCapsule;
+            return base.Equals(obj) && otherCapsule?.ControlMultiplier == ControlMultiplier;
+        }
+
+        public override RocketComponent Clone()
+        {
+            return new RocketCapsule(Name, Weight, Cost, Utils.GetCopy(Texture), Canvas, ControlMultiplier);
+        }
     }
 }
