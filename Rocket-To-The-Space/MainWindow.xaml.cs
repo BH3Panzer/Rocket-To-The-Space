@@ -222,6 +222,7 @@ namespace Rocket_To_The_Space
             mainWindow.KeyDown += GameKeyPressHandler;
             rocket = new Rocket();
             rocket.Init(game);
+            rocket.Update((UCGame)currentUC, camera);
 #if DEBUG
             mainWindow.KeyDown += DebugKeyHandler;
         }
@@ -340,7 +341,7 @@ namespace Rocket_To_The_Space
             {
                 return;
             }
-            rocket.Update((UCGame)currentUC);
+            rocket.Update((UCGame)currentUC, camera);
             camera.Y -= rocket.Speed;
         }
 
