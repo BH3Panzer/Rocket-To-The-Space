@@ -22,7 +22,7 @@ namespace Rocket_To_The_Space
             Speed = 8;
             RocketBox = new Rectangle();
             RocketBox.Width = 64;
-            RocketBox.Height = 256;
+            RocketBox.Height = 128;
             RocketBox.Fill = System.Windows.Media.Brushes.Red;
         }
 
@@ -32,13 +32,17 @@ namespace Rocket_To_The_Space
             RocketBox.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
             RocketBox.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             Canvas.SetZIndex(this.RocketBox, 0b10); // easter egg :)
-            this.Y = uc.gameCanvas.Height - RocketBox.Height - 100;
+            this.Y = uc.gameCanvas.Height - RocketBox.Height - 90;
             this.X = (uc.gameCanvas.Width - RocketBox.Width) / 2;
         }
 
-        public void Update(UCGame uc, Camera cam)
+        public void Update()
         {
             this.Y -= this.Speed;
+        }
+
+        public void Show(UCGame uc, Camera cam)
+        {
             Canvas.SetTop(this.RocketBox, this.Y - cam.Y);
             Canvas.SetLeft(this.RocketBox, this.X - cam.X);
         }

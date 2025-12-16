@@ -33,6 +33,8 @@ namespace Rocket_To_The_Space
         private uint launchCount = 0;
         private Slot[] shopSlots = new Slot[8];
         private Slot lastSelectedShopSlot;
+        private Button sellButton = new Button();
+        private Button addToRocketButton = new Button();
         private static readonly decimal WOOD_MIN_PRICE = 0.5m;
         private static readonly decimal WOOD_MAX_PRICE = 10m;
         private static readonly int WOOD_MIN_WEIGHT = 10;
@@ -64,6 +66,45 @@ namespace Rocket_To_The_Space
             Cursor = Cursors.None;
             cursor.IsHitTestVisible = false;
             ShowMainMenu();
+        }
+
+        private void InitializeButtons()
+        {
+            sellButton.Content = "Sell";
+            sellButton.Width = 80;
+            sellButton.Height = 40;
+            Panel.SetZIndex(sellButton, 3);
+            sellButton.Click += SellButtonClickHandler;
+            sellButton.HorizontalAlignment = HorizontalAlignment.Left;
+            sellButton.VerticalAlignment = VerticalAlignment.Top;
+            sellButton.FontSize = 16;
+
+            addToRocketButton.Content = "Add";
+            addToRocketButton.Width = 80;
+            addToRocketButton.Height = 40;
+            Panel.SetZIndex(addToRocketButton, 3);
+            addToRocketButton.Click += AddToRocketButtonClickHandler;
+            addToRocketButton.HorizontalAlignment = HorizontalAlignment.Left;
+            addToRocketButton.VerticalAlignment = VerticalAlignment.Top;
+            addToRocketButton.FontSize = 16;
+
+
+            ((UCGame)currentUC).gameCanvas.Children.Add(sellButton);
+            Canvas.SetLeft(sellButton, 5);
+            Canvas.SetTop(sellButton, 500);
+            ((UCGame)currentUC).gameCanvas.Children.Add(addToRocketButton);
+            Canvas.SetLeft(addToRocketButton, 5);
+            Canvas.SetTop(addToRocketButton, 455);
+        }
+
+        private void AddToRocketButtonClickHandler(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void SellButtonClickHandler(object sender, RoutedEventArgs e)
+        {
+            
         }
 
         private void InitializeSlots(UCGame ucGame)
@@ -215,6 +256,7 @@ namespace Rocket_To_The_Space
             currentUC = game;
             InitializeShop();
             InitializeSlots(game);
+            InitializeButtons();
             game.shop.Visibility = Visibility.Collapsed;
             mainContentControl.Content = game;
             game.gameCanvas.MouseDown += GameClickHandler;
@@ -222,7 +264,7 @@ namespace Rocket_To_The_Space
             mainWindow.KeyDown += GameKeyPressHandler;
             rocket = new Rocket();
             rocket.Init(game);
-            rocket.Update((UCGame)currentUC, camera);
+            rocket.Show(game, camera);
 #if DEBUG
             mainWindow.KeyDown += DebugKeyHandler;
         }
@@ -341,7 +383,8 @@ namespace Rocket_To_The_Space
             {
                 return;
             }
-            rocket.Update((UCGame)currentUC, camera);
+            rocket.Update();
+            rocket.Show((UCGame)currentUC, camera);
             camera.Y -= rocket.Speed;
         }
 
