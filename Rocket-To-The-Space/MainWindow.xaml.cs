@@ -370,6 +370,10 @@ namespace Rocket_To_The_Space
             {
                 if (slot.IsEmpty())
                 {
+                    if (money - lastSelectedShopSlot.GetRocketComponent().Cost < 0)
+                    {
+                        return;
+                    }
                     money -= lastSelectedShopSlot.GetRocketComponent().Cost;
                     slot.SetComponent(lastSelectedShopSlot.GetRocketComponent().Clone());
                     Image texture = slot.GetRocketComponent().Texture;
@@ -682,7 +686,7 @@ namespace Rocket_To_The_Space
             {
                 return;
             }
-            if (rocket.Update())
+            if (rocket.Update(ref money))
             {
                 GoBackToGround();
                 ResetBackgroundAndLaunchpad();
