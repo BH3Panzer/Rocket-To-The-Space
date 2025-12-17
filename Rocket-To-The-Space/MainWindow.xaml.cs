@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -263,7 +265,7 @@ namespace Rocket_To_The_Space
         private void resetShop(int tier1, int tier2)
         {
             UCGame game = (UCGame)currentUC;
-            game.shopItemInfo.Visibility = Visibility.Collapsed;
+            game.shopItemInfo.Visibility = Visibility.Hidden;
             double slotX = (game.shop.Width - 48 * 4) / 4;
             double slotY = 50;
             foreach (Slot slot in shopSlots)
@@ -790,11 +792,7 @@ namespace Rocket_To_The_Space
         {
             UCGame game = (UCGame)currentUC;
             game.shopItemInfo.Visibility = Visibility.Visible;
-            int xOffset = 30;
-            if ((Array.IndexOf(shopSlots, slot) + 1) % 4 == 0)
-            {
-                xOffset = -30;
-            }
+            Canvas.SetZIndex(game.shopItemInfo, 4);
             Canvas.SetTop(game.shopItemInfo, 0);
             Canvas.SetLeft(game.shopItemInfo, mainWindow.Width - game.shopItemInfo.Width - 20);
             double currentMargin = 0;
@@ -870,6 +868,10 @@ namespace Rocket_To_The_Space
                 currentMargin += marginInterval;
                 game.shopItemInfo.Children.Add(fuelCapacity);
             }
+            foreach (UIElement children in game.shopItemInfo.Children)
+            {
+                children.Visibility = Visibility.Visible;
+            }
         }
 
         private void UpdateShopHovering()
@@ -882,8 +884,9 @@ namespace Rocket_To_The_Space
             Slot hoveredSlot = null;
             if (GetHoveredSlot(out hoveredSlot, shopSlots, ((UCGame)currentUC).shop))
             {
-               SetInfo(hoveredSlot);
-            } else
+                SetInfo(hoveredSlot);
+            } 
+            else
             {
                 ((UCGame)currentUC).shopItemInfo.Visibility = Visibility.Hidden;
             }
@@ -895,9 +898,13 @@ namespace Rocket_To_The_Space
             Slot hoveredSlot = null;
             if (GetHoveredSlot(out hoveredSlot, slots, ((UCGame)currentUC).gameCanvas))
             {
-                SetInfo(hoveredSlot);
+                if (!hoveredSlot.IsEmpty())
+                {
+
+                    SetInfo(hoveredSlot);
+                }
             }
-            else
+            else if (!isShopOpened)
             {
                 ((UCGame)currentUC).shopItemInfo.Visibility = Visibility.Hidden;
             }
