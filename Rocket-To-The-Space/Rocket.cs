@@ -42,10 +42,12 @@ namespace Rocket_To_The_Space
             UpdateComponents();
         }
 
-        public bool Update()
+        public bool Update(ref decimal money)
         {
             bool result = UpdateStats();
             this.Y -= this.Speed;
+            money += (decimal)(this.Speed * 0.0005);
+            Math.Round(money, 2);
             UpdateComponents();
             return result;
         }
