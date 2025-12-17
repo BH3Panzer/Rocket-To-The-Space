@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -14,8 +15,8 @@ namespace Rocket_To_The_Space
         public double Speed { get; private set; }
 
         public Rectangle RocketBox { get; private set; }
-        public double X { get; private set; }
-        public double Y { get; private set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public Rocket()
         {
             Components = new List<RocketComponent>();
@@ -42,10 +43,12 @@ namespace Rocket_To_The_Space
             UpdateComponents();
         }
 
-        public bool Update()
+        public bool Update(ref decimal money)
         {
             bool result = UpdateStats();
             this.Y -= this.Speed;
+            money += (decimal)(this.Speed * 0.0005);
+            Math.Round(money, 2);
             UpdateComponents();
             return result;
         }
@@ -90,6 +93,7 @@ namespace Rocket_To_The_Space
 
         public bool AddComponent(RocketComponent component)
         {
+            component.IsAttachedToRocket = true;
             bool ok = false;
             if (component is RocketCapsule)
             {
@@ -162,6 +166,10 @@ namespace Rocket_To_The_Space
             uint tankCount = 0;
             foreach (var component in Components)
             {
+                if (!component.IsAttachedToRocket)
+                {
+                    continue;
+                }
                 if (component is RocketCapsule)
                 {
                     component.SetX(this.X + (this.RocketBox.Width - component.Texture.Width) / 2);
@@ -176,6 +184,10 @@ namespace Rocket_To_The_Space
             }
             foreach (var component in Components)
             {
+                if (!component.IsAttachedToRocket)
+                {
+                    continue;
+                }
                 if (component is RocketEngine)
                 {
                     component.SetX(this.X + (this.RocketBox.Width - component.Texture.Width) / 2);
