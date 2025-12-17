@@ -32,11 +32,13 @@ namespace Rocket_To_The_Space
         private Label[] stageCheckpoint = new Label[6];
         private double[] initialStageCheckpointY = new double[6];
         private MediaPlayer mediaPlayer = new MediaPlayer();
-        private uint launchCount = 0;
+        private uint launchCount = 20;
         private Slot[] shopSlots = new Slot[8];
         private Slot lastSelectedShopSlot;
         private bool isShopOpened = false;
-        private decimal money = 20;
+        private decimal money = 2000;
+        private bool isShopInialized = false;
+        private bool isGameFinished = false;
         private static readonly Dictionary<string, decimal> PRICES = new Dictionary<string, decimal>()
         {
             {"WOODEN_MIN", 0.5m },
@@ -54,16 +56,6 @@ namespace Rocket_To_The_Space
             {"PLASTIC_MAX", 15 },
             {"CARBON_MIN", 5 },
             {"CARBON_MAX", 10 }
-        };
-        private static readonly Dictionary<string, int> BOOSTER_THRUST_POWER = new Dictionary<string, int>
-        {
-            {"WOODEN_MIN", 80 },
-            {"WOODEN_MAX", 100 }
-        };
-
-        private static readonly Dictionary<string, int> MAX_ENERGY = new Dictionary<string, int>
-        {
-            {"WOODEN", 1000 }
         };
 
         private static readonly Dictionary<string, double> CONTROL_MULTIPLIER = new Dictionary<string, double>()
@@ -158,22 +150,25 @@ namespace Rocket_To_The_Space
                 {
                     if (slot.IsEmpty() && !did)
                     {
-                        rocket.RemoveComponent(((UCGame)currentUC).gameCanvas, rocket.Components[i]);
+                        rocket.RemoveComponent(((UCGame)currentUC).gameCanvas, component);
+                        //rocket.UpdateComponents();
+                        //rocket.Draw(camera);
                         slot.SetComponent(component);
-                        Canvas.SetZIndex(slot.GetRocketComponent().Texture, 3);
+                        component.IsAttachedToRocket = false;
+                        Canvas.SetZIndex(slot.GetRocketComponent().Texture, 4);
                         ((UCGame)currentUC).gameCanvas.Children.Add(component.Texture);
                         did = true;
                     }
                     slot.Draw();
-                    
+                    if (did)
+                    {
+                        break;
+                    }
                 }
                 if (!did)
                 {
                     rocket.RemoveComponent(((UCGame)currentUC).gameCanvas, component);
                 }
-                rocket.UpdateComponents();
-                rocket.Draw(camera);
-
             }
         }
 
@@ -290,21 +285,13 @@ namespace Rocket_To_The_Space
                 string frTier = GetTierNameFR(currentTier);
                 string enTier = GetTierNameEN(currentTier);
                 RocketComponent shopItem = null;
-                int rndType = random.Next(1, 5);
+                int rndType = random.Next(2, 5);
                 int weight = random.Next(WEIGHTS[$"{enTier.ToUpper()}_MIN"], WEIGHTS[$"{enTier.ToUpper()}_MAX"] + 1);
                 decimal price = Math.Round(PRICES[$"{enTier.ToUpper()}_MIN"] + (decimal)(random.NextDouble()) * (PRICES[$"{enTier.ToUpper()}_MAX"] - PRICES[$"{enTier.ToUpper()}_MIN"]), 2);
                 Image componentTexture = new Image();
                 componentTexture.Width = 32;
                 componentTexture.Height = 32;
-                if (rndType == 1)
-                {
-                    BitmapImage img = new BitmapImage(new Uri($"pack://application:,,,/Assets/Img/RocketBoosters/{enTier}_booster.png", UriKind.Absolute));
-                    componentTexture.Source = img;
-                    componentTexture.Width = 16;
-                    componentTexture.Height = 32;
-                    int thrustPower = random.Next(BOOSTER_THRUST_POWER[$"{enTier.ToUpper()}_MIN"], BOOSTER_THRUST_POWER[$"{enTier.ToUpper()}_MAX"] + 1);
-                    shopItem = new RocketBooster($"Boosteur en {frTier}", weight, price, componentTexture, ((UCGame) currentUC).gameCanvas, thrustPower, MAX_ENERGY[$"{enTier.ToUpper()}"]);
-                } else if (rndType == 2)
+                if (rndType == 2)
                 {
                     BitmapImage img = new BitmapImage(new Uri($"pack://application:,,,/Assets/Img/RocketCapsules/{enTier}_capsule.png", UriKind.Absolute));
                     componentTexture.Source = img;
@@ -355,7 +342,11 @@ namespace Rocket_To_The_Space
                 shopSlots[i] = slot;
                 shopSlots[i].Draw();
             }
-            game.buyButton.Click += Buy;
+            if (!isShopInialized)
+            {
+                game.buyButton.Click += Buy;
+                isShopInialized = true;
+            }
             game.closeShopButton.Click += CloseShop;
             game.openShopButton.Click += OpenShop;
         }
@@ -450,7 +441,7 @@ namespace Rocket_To_The_Space
                 }
             }
             currentUC = game;
-            resetShop(1, 1);
+            UpdateShopTier();
             InitializeSlots(game);
             InitializeButtons();
             game.shop.Visibility = Visibility.Collapsed;
@@ -778,8 +769,13 @@ namespace Rocket_To_The_Space
 
         private void UpdateCurrentStage()
         {
-            if (currentStage == 7 || currentStage == 0)
+            if (currentStage == 6 || currentStage == 0)
             {
+                if (currentStage == 6)
+                {
+                    isGameFinished = true;
+                    MessageBox.Show("Félicitations ! Vous avez atteint l'espace !");
+                }
                 return;
             }
             if (Canvas.GetTop(stageCheckpoint[currentStage - 1]) + mainWindow.ActualHeight  >= mainWindow.ActualHeight)
@@ -918,6 +914,10 @@ namespace Rocket_To_The_Space
 
         private void UpdateGame(object? sender, EventArgs e)
         {
+            if (isGameFinished)
+            {
+                return;
+            }
             UpdateRocket();
             UpdateDecoration();
             UpdateCurrentStage();

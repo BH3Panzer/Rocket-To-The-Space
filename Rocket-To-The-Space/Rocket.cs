@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -92,6 +93,7 @@ namespace Rocket_To_The_Space
 
         public bool AddComponent(RocketComponent component)
         {
+            component.IsAttachedToRocket = true;
             bool ok = false;
             if (component is RocketCapsule)
             {
@@ -164,6 +166,10 @@ namespace Rocket_To_The_Space
             uint tankCount = 0;
             foreach (var component in Components)
             {
+                if (!component.IsAttachedToRocket)
+                {
+                    continue;
+                }
                 if (component is RocketCapsule)
                 {
                     component.SetX(this.X + (this.RocketBox.Width - component.Texture.Width) / 2);
@@ -178,6 +184,10 @@ namespace Rocket_To_The_Space
             }
             foreach (var component in Components)
             {
+                if (!component.IsAttachedToRocket)
+                {
+                    continue;
+                }
                 if (component is RocketEngine)
                 {
                     component.SetX(this.X + (this.RocketBox.Width - component.Texture.Width) / 2);

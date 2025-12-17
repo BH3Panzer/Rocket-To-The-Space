@@ -11,6 +11,7 @@ namespace Rocket_To_The_Space
         public Image Texture { get; set; }
         public double X { get; private set; }
         public double Y { get; private set; }
+        public bool IsAttachedToRocket { get; set; }
 
         public Canvas Canvas;
         protected RocketComponent(string name, int weight, decimal cost, Image texture, Canvas canvas)

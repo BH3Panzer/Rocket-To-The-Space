@@ -54,6 +54,13 @@ namespace Rocket_To_The_Space
             {
                 Image.Visibility = Visibility.Visible;
             }
+            if (component != null)
+            {
+                component.Texture.Visibility = Visibility.Visible;
+            }
+            {
+                
+            }
         }
 
         public void SetComponent(RocketComponent component)
