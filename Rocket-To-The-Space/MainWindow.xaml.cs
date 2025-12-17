@@ -261,6 +261,14 @@ namespace Rocket_To_The_Space
             game.shopItemInfo.Visibility = Visibility.Collapsed;
             double slotX = (game.shop.Width - 48 * 4) / 4;
             double slotY = 50;
+            foreach (Slot slot in shopSlots)
+            {
+                if (slot != null)
+                {
+                    game.shop.Children.Remove(slot.Image);
+                }
+            }
+            shopSlots = new Slot[8];
             for (int i = 0; i < shopSlots.Length; i++)
             {
                 int tierChosen = random.Next(1, 6);
@@ -506,6 +514,27 @@ namespace Rocket_To_The_Space
                         Canvas.SetTop((Image)obj, game.gameCanvas.ActualHeight - ((Image)obj).ActualHeight - 100);
                     }
                 }
+            }
+            UpdateShopTier();
+        }
+
+        private void UpdateShopTier()
+        {
+            if (launchCount <= 1)
+            {
+                resetShop(1, 1);
+            } else if (launchCount >= 2 && launchCount <= 4)
+            {
+                resetShop(1, 2);
+            } else if (launchCount >= 5 && launchCount <= 7)
+            {
+                resetShop(2, 2);
+            } else if (launchCount >= 8 && launchCount <= 11)
+            {
+                resetShop(2, 3);
+            } else if (launchCount >= 12)
+            {
+                resetShop(3, 3);
             }
         }
 
