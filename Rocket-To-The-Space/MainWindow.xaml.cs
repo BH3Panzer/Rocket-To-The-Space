@@ -32,11 +32,11 @@ namespace Rocket_To_The_Space
         private Label[] stageCheckpoint = new Label[6];
         private double[] initialStageCheckpointY = new double[6];
         private MediaPlayer mediaPlayer = new MediaPlayer();
-        private uint launchCount = 20;
+        private uint launchCount = 0;
         private Slot[] shopSlots = new Slot[8];
         private Slot lastSelectedShopSlot;
         private bool isShopOpened = false;
-        private decimal money = 2000;
+        private decimal money = 20;
         private bool isShopInialized = false;
         private bool isGameFinished = false;
         private static readonly Dictionary<string, decimal> PRICES = new Dictionary<string, decimal>()
