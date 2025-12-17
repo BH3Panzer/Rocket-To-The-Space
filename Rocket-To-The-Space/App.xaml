@@ -37,6 +37,10 @@
                         <Setter Property="Background" Value="Gold"/>
                         <Setter Property="BorderBrush" Value="Orange"/>
                     </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="DimGray"/>
+                    <Setter Property="BorderBrush" Value="Black"/>
+                </Trigger>
                 </Style.Triggers>
             </Style>
     </Application.Resources>

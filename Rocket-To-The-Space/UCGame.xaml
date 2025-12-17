@@ -8,12 +8,28 @@
              d:DesignHeight="609" d:DesignWidth="520">
     <Canvas x:Name="gameCanvas" Width="520" Height="609" HorizontalAlignment="Left" VerticalAlignment="Top">
         <Image x:Name="bg" x:Uid="bg" Source="pack://application:,,,/Assets/Img/bg.png" Canvas.Left="0" Canvas.Top="-64965" StretchDirection="UpOnly" Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Center" MinWidth="520" Width="360"/>
-        <Button x:Name="launchButton" Content="Launch" Canvas.Left="206" Canvas.Top="10" HorizontalAlignment="Left" VerticalAlignment="Center" Panel.ZIndex="3"/>
-        <Label Content="stage 2" x:Uid="stage2" Canvas.Left="265" Canvas.Top="-5316" FontSize="100"/>
-        <Label Content="stage 3" x:Uid="stage3" Canvas.Left="246" Canvas.Top="-29858" FontSize="100"/>
-        <Label Content="stage 4" x:Uid="stage4" Canvas.Left="265" Canvas.Top="-45008" FontSize="100"/>
-        <Label Content="stage 5" x:Uid="stage5" Canvas.Left="236" Canvas.Top="-49590" FontSize="100"/>
-        <Label Content="stage 6" x:Uid="stage6" Canvas.Left="227" Canvas.Top="-62820" FontSize="100"/>
-        <Label Content="stage end" x:Uid="stageEnd" Canvas.Left="227" Canvas.Top="-64965" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="100"/>
+        <Button x:Name="launchButton" Content="Lancer" Canvas.Left="206" Canvas.Top="10" HorizontalAlignment="Left" VerticalAlignment="Center" Panel.ZIndex="3"/>
+        <Label Tag="checkpoint" Content="stage 2" x:Uid="stage2" Canvas.Left="265" Canvas.Top="-5316" FontSize="100"/>
+        <Label Tag="checkpoint" Content="stage 3" x:Uid="stage3" Canvas.Left="246" Canvas.Top="-29858" FontSize="100"/>
+        <Label Tag="checkpoint" Content="stage 4" x:Uid="stage4" Canvas.Left="265" Canvas.Top="-45008" FontSize="100"/>
+        <Label Tag="checkpoint" Content="stage 5" x:Uid="stage5" Canvas.Left="236" Canvas.Top="-49590" FontSize="100"/>
+        <Label Tag="checkpoint" Content="stage 6" x:Uid="stage6" Canvas.Left="227" Canvas.Top="-62820" FontSize="100"/>
+        <Label Tag="checkpoint" Content="stage end" x:Uid="stageEnd" Canvas.Left="227" Canvas.Top="-64965" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="100"/>
+        <Image x:Name="launchpad" Height="528" Source="pack://application:,,,/Assets/Img/starting_point.png" Stretch="Fill" Canvas.Top="43" Width="520" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="-2" Panel.ZIndex="2"/>
+        <Canvas x:Name="shop" Canvas.Left="298" Canvas.Top="288" Height="237" Width="220" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="4">
+            <Rectangle x:Name="shopBackground" Height="237" Canvas.Left="0" Stroke="White" Fill="White" Canvas.Top="0" Width="220" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="3"/>
+            <Label x:Name="shopTitle" Content="Magasins" HorizontalAlignment="Left" VerticalAlignment="Center" Panel.ZIndex="3" FontSize="24" Canvas.Left="29"/>
+            <Button x:Name="buyButton" Content="Acheter" Canvas.Left="49" Canvas.Top="156" Panel.ZIndex="3" IsEnabled="False"/>
+            <Button x:Name="closeShopButton" Content="X" Canvas.Left="166" Panel.ZIndex="3" HorizontalAlignment="Left" VerticalAlignment="Center" Width="44" Height="44"/>
+        </Canvas>
+        <Grid x:Name="shopItemInfo" Background="Black" Panel.ZIndex="4" Height="268" Width="194">
+
+        </Grid>
+        <Label x:Name="fuelText" HorizontalAlignment="Left" Margin="10,57,0,0" VerticalAlignment="Top" FontSize="20" Foreground="White" Panel.ZIndex="4"/>
+
+        <Label x:Name="moneyText" FontSize="20" Content="100" Canvas.Left="10" Canvas.Top="10" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="4"/>
+        <Image Height="32" Canvas.Left="94" Source="/Assets/Img/coin.png" Stretch="Fill" Canvas.Top="12" Width="32" Panel.ZIndex="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Button x:Name="openShopButton" Content="Magasins" Canvas.Left="366" Canvas.Top="443" Panel.ZIndex="3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="135"/>
+
     </Canvas>
 </UserControl>

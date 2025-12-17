@@ -4,13 +4,22 @@ namespace Rocket_To_The_Space
 {
     internal class RocketCapsule : RocketComponent
     {
-        public double AirFrictionMultiplier { get; }
-        public int ControlMultiplier { get; } 
-        public RocketCapsule(string name, int weight, int cost, Image texture, Canvas canvas, double airFrictionMultiplicator, int controlMultiplier) : base(name, weight, cost, texture, canvas)
+        public double ControlMultiplier { get; } 
+        public RocketCapsule(string name, int weight, decimal cost, Image texture, Canvas canvas, double controlMultiplier) : base(name, weight, cost, texture, canvas)
         {
-            this.AirFrictionMultiplier = airFrictionMultiplicator;
             this.ControlMultiplier = controlMultiplier;
 
+        }
+
+        public override bool Equals(object? obj)
+        {
+            RocketCapsule? otherCapsule = obj as RocketCapsule;
+            return base.Equals(obj) && otherCapsule?.ControlMultiplier == ControlMultiplier;
+        }
+
+        public override RocketComponent Clone()
+        {
+            return new RocketCapsule(Name, Weight, Cost, Utils.GetCopy(Texture), Canvas, ControlMultiplier);
         }
     }
 }
