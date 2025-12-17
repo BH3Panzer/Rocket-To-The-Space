@@ -58,11 +58,16 @@ namespace Rocket_To_The_Space
 
         public void SetComponent(RocketComponent component)
         {
-            if (this.component != null)
-            {
-                this.component.Canvas.Children.Remove(this.component.Texture);
-            }
             this.component = component;
+        }
+
+        public void RemoveComponent()
+        {
+            if (component != null)
+            {
+                component.Canvas.Children.Remove(component.Texture);
+            }
+            component = null;
         }
 
         public RocketComponent GetRocketComponent()

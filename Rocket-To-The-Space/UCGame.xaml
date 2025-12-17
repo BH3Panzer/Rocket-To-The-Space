@@ -25,6 +25,8 @@
         <Grid x:Name="shopItemInfo" Background="Black" Panel.ZIndex="4" Height="268" Width="194">
 
         </Grid>
+        <Label x:Name="fuelText" HorizontalAlignment="Left" Margin="10,57,0,0" VerticalAlignment="Top" FontSize="20" Foreground="White" Panel.ZIndex="4"/>
+
         <Label x:Name="moneyText" FontSize="20" Content="100" Canvas.Left="10" Canvas.Top="10" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="4"/>
         <Image Height="32" Canvas.Left="94" Source="/Assets/Img/coin.png" Stretch="Fill" Canvas.Top="12" Width="32" Panel.ZIndex="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <Button x:Name="openShopButton" Content="Magasins" Canvas.Left="366" Canvas.Top="443" Panel.ZIndex="3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="135"/>

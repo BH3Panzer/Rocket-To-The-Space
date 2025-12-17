@@ -36,7 +36,7 @@ namespace Rocket_To_The_Space
         private Slot[] shopSlots = new Slot[8];
         private Slot lastSelectedShopSlot;
         private bool isShopOpened = false;
-        private decimal money = 100;
+        private decimal money = 20;
         private static readonly Dictionary<string, decimal> PRICES = new Dictionary<string, decimal>()
         {
             {"WOODEN_MIN", 0.5m },
@@ -87,6 +87,7 @@ namespace Rocket_To_The_Space
         };
         private Button sellButton = new Button();
         private Button addToRocketButton = new Button();
+        private Button disassembleButton = new Button();
 
         public MainWindow()
         {
@@ -119,6 +120,16 @@ namespace Rocket_To_The_Space
             addToRocketButton.FontSize = 16;
             addToRocketButton.IsEnabled = false;
 
+            disassembleButton.Content = "Démonter";
+            disassembleButton.Width = 90;
+            disassembleButton.Height = 40;
+            Panel.SetZIndex(disassembleButton, 3);
+            disassembleButton.Click += DisassembleRocket;
+            disassembleButton.HorizontalAlignment = HorizontalAlignment.Left;
+            disassembleButton.VerticalAlignment = VerticalAlignment.Top;
+            disassembleButton.FontSize = 16;
+
+
 
             ((UCGame)currentUC).gameCanvas.Children.Add(sellButton);
             Canvas.SetLeft(sellButton, 5);
@@ -126,16 +137,62 @@ namespace Rocket_To_The_Space
             ((UCGame)currentUC).gameCanvas.Children.Add(addToRocketButton);
             Canvas.SetLeft(addToRocketButton, 5);
             Canvas.SetTop(addToRocketButton, 400);
+            ((UCGame)currentUC).gameCanvas.Children.Add(disassembleButton);
+            Canvas.SetLeft(disassembleButton, 5);
+            Canvas.SetTop(disassembleButton, 350);
+        }
+
+        private void DisassembleRocket(object sender, RoutedEventArgs e)
+        {
+            bool did = false;
+            int length = rocket.GetComponents().Count;
+            for (int i = 0; i < length; i++)
+            {
+                RocketComponent component = rocket.Components[i];
+
+                foreach (Slot slot in slots)
+                {
+                    if (slot.IsEmpty() && !did)
+                    {
+                        rocket.RemoveComponent(((UCGame)currentUC).gameCanvas, rocket.Components[i]);
+                        slot.SetComponent(component);
+                        ((UCGame)currentUC).gameCanvas.Children.Add(component.Texture);
+                        did = true;
+                    }
+                    slot.Draw();
+                    
+                }
+                if (!did)
+                {
+                    rocket.RemoveComponent(((UCGame)currentUC).gameCanvas, component);
+                }
+                rocket.UpdateComponents();
+                rocket.Draw(camera);
+
+            }
         }
 
         private void AddToRocketButtonClickHandler(object sender, RoutedEventArgs e)
         {
+            RocketComponent compo = lastSelectedSlot.GetRocketComponent();
+            if (rocket.AddComponent(compo))
+            {
+                lastSelectedSlot.RemoveComponent();
+                addToRocketButton.IsEnabled = false;
+                sellButton.IsEnabled = false;
+                rocket.AddComponentToCanvas(compo, ((UCGame)currentUC).gameCanvas);
+                rocket.Draw(camera);
+            }
             
+
         }
 
         private void SellButtonClickHandler(object sender, RoutedEventArgs e)
         {
-            
+            money += lastSelectedSlot.GetRocketComponent().Cost;
+            lastSelectedSlot.RemoveComponent();
+            addToRocketButton.IsEnabled = false;
+            sellButton.IsEnabled = false;
         }
 
         private void InitializeSlots(UCGame ucGame)
@@ -161,6 +218,7 @@ namespace Rocket_To_The_Space
                 slots[i].Draw();
 
             }   
+            GenerateBaseInventory();
         }
 
         private void InitializeTimer()
@@ -415,7 +473,10 @@ namespace Rocket_To_The_Space
 
         private void LaunchRocket(object sender, RoutedEventArgs e)
         {
-            //TODO: Check if rocket is ready to launch
+            if (!rocket.IsReadyForLaunch(isRocketLaunched))
+            {
+                return;
+            }
             isRocketLaunched = true;
             launchCount++;
             currentStage = 1;
@@ -427,7 +488,47 @@ namespace Rocket_To_The_Space
             game.launchButton.Visibility = Visibility.Hidden;
             addToRocketButton.Visibility = Visibility.Hidden;
             sellButton.Visibility = Visibility.Hidden;
+            disassembleButton.Visibility = Visibility.Hidden;
+            game.openShopButton.Visibility = Visibility.Hidden;
+            timer.Tick += rocket.DrainFuel;
 
+        }
+
+        private void ResetBackgroundAndLaunchpad()
+        {
+            if (currentUC is UCGame)
+            {
+                UCGame game = (UCGame)currentUC;
+                foreach (UIElement obj in game.gameCanvas.Children)
+                {
+                    if (obj is Image && ((Image)obj).Name == "launchpad")
+                    {
+                        Canvas.SetLeft((Image)obj, (game.gameCanvas.ActualWidth - ((Image)obj).ActualWidth) / 2);
+                        Canvas.SetTop((Image)obj, game.gameCanvas.ActualHeight - ((Image)obj).ActualHeight - 100);
+                    }
+                }
+            }
+        }
+
+        private void GoBackToGround()
+        {
+            isRocketLaunched = false;
+            foreach (Slot slot in slots)
+            {
+                slot.Show();
+            }
+            UCGame game = (UCGame)currentUC;
+            game.launchButton.Visibility = Visibility.Visible;
+            addToRocketButton.Visibility = Visibility.Visible;
+            sellButton.Visibility = Visibility.Visible;
+            disassembleButton.Visibility = Visibility.Visible;
+            game.openShopButton.Visibility = Visibility.Visible;
+            timer.Tick -= rocket.DrainFuel;
+            rocket.ResetPosition(game);
+            camera.Y = 0;
+            lastCameraX = 0;
+            lastCameraY = 0;
+            currentStage = 0;
         }
 
         private void GameClickHandler(object sender, MouseButtonEventArgs e)
@@ -529,9 +630,14 @@ namespace Rocket_To_The_Space
             {
                 return;
             }
-            rocket.Update();
+            if (rocket.Update())
+            {
+                GoBackToGround();
+                ResetBackgroundAndLaunchpad();
+            }
             rocket.Draw(camera);
             camera.Y = (rocket.Y + rocket.RocketBox.ActualHeight + 90) - ((UCGame)currentUC).gameCanvas.Height;
+            ((UCGame)currentUC).fuelText.Content = rocket.GetTotalFuel().ToString();
         }
 
         private void UpdateCamera()
@@ -544,7 +650,7 @@ namespace Rocket_To_The_Space
                 lastCameraY = camera.Y;
                 foreach (UIElement obj in ((UCGame)currentUC).gameCanvas.Children)
                 {
-                    if (obj is Image)
+                    if (obj is Image && (obj.Uid == "bg" || ((Image)obj).Tag == "decoration_cloud" || ((Image)obj).Name == "launchpad"))
                     {
                         Image image = (Image)obj;
                         double left = Canvas.GetLeft(image);
@@ -564,24 +670,6 @@ namespace Rocket_To_The_Space
                         }
                         Canvas.SetLeft(image, left - localDeltaX);
                         Canvas.SetTop(image, top - localDeltaY);
-                    }
-                    if (obj is Label)
-                    {
-                        Label label = (Label)obj;
-                        double left = Canvas.GetLeft(label);
-                        double top = Canvas.GetTop(label);
-                        Canvas.SetLeft(label, left - deltaX * BACKGROUND_SPEED_MULTIPLIER);
-                        Canvas.SetTop(label, top - deltaY * BACKGROUND_SPEED_MULTIPLIER);
-                    }
-                    if (obj is Rectangle)
-                    { 
-                        Rectangle rec = (Rectangle)obj;
-                        double left = Canvas.GetLeft(rec);
-                        double top = Canvas.GetTop(rec);
-                        double localDeltaX = deltaX;
-                        double localDeltaY = deltaY;
-                        Canvas.SetLeft(rec, left - localDeltaX);
-                        Canvas.SetTop(rec, top - localDeltaY);
                     }
                 }
             }
@@ -792,10 +880,26 @@ namespace Rocket_To_The_Space
                 new Rect(0, 0, e.ActualWidth, e.ActualHeight));
         }
 
-        private void generateBaseInventory()
+        private void GenerateBaseInventory()
         {
             if (launchCount == 0)
             {
+                Image texture = new Image();
+                texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketCapsules/wooden_capsule.png", UriKind.Absolute));
+                texture.Width = 32;
+                texture.Height = 32;
+                Canvas.SetZIndex(texture, 3);
+                slots[0].SetComponent(new RocketCapsule("Capsule en bois", WEIGHTS["WOODEN_MAX"], PRICES["WOODEN_MIN"], Utils.GetCopy(texture), ((UCGame)currentUC).gameCanvas, CONTROL_MULTIPLIER["WOODEN"]));
+                ((UCGame)currentUC).gameCanvas.Children.Add(slots[0].GetRocketComponent().Texture);
+                slots[0].Draw();
+                texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketTanks/wooden_tank.png", UriKind.Absolute));
+                slots[1].SetComponent(new RocketTank("Reservoir en bois", WEIGHTS["WOODEN_MAX"], PRICES["WOODEN_MIN"], Utils.GetCopy(texture), ((UCGame)currentUC).gameCanvas, TANK_FUEL_CAPACITY["WOODEN"]));
+                ((UCGame)currentUC).gameCanvas.Children.Add(slots[1].GetRocketComponent().Texture);
+                slots[1].Draw();
+                texture.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/RocketEngine/wooden_engine.png", UriKind.Absolute));
+                slots[2].SetComponent(new RocketEngine("Moteur en bois", WEIGHTS["WOODEN_MAX"], PRICES["WOODEN_MIN"], Utils.GetCopy(texture), ((UCGame)currentUC).gameCanvas, ENGINE_THRUST_POWER["WOODEN_MAX"]));
+                ((UCGame)currentUC).gameCanvas.Children.Add(slots[2].GetRocketComponent().Texture);
+                slots[2].Draw();
             }
         }
 
