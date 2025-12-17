@@ -146,16 +146,17 @@ namespace Rocket_To_The_Space
         {
             bool did = false;
             int length = rocket.GetComponents().Count;
-            for (int i = 0; i < length; i++)
+            for (int i = length - 1; i >= 0; i--)
             {
                 RocketComponent component = rocket.Components[i];
-
+                did = false;
                 foreach (Slot slot in slots)
                 {
                     if (slot.IsEmpty() && !did)
                     {
                         rocket.RemoveComponent(((UCGame)currentUC).gameCanvas, rocket.Components[i]);
                         slot.SetComponent(component);
+                        Canvas.SetZIndex(slot.GetRocketComponent().Texture, 3);
                         ((UCGame)currentUC).gameCanvas.Children.Add(component.Texture);
                         did = true;
                     }

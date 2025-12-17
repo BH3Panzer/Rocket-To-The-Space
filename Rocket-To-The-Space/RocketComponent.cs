@@ -8,7 +8,7 @@ namespace Rocket_To_The_Space
         public string Name { get; private set; }
         public int Weight { get; private set; }
         public decimal Cost { get; set; }
-        public Image Texture { get;}
+        public Image Texture { get; set; }
         public double X { get; private set; }
         public double Y { get; private set; }
 
