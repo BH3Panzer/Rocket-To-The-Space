@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -46,7 +47,11 @@ namespace Rocket_To_The_Space
         private static readonly Dictionary<string, int> WEIGHTS = new Dictionary<string, int>
         {
             {"WOODEN_MIN", 10 },
-            {"WOODEN_MAX", 20 }
+            {"WOODEN_MAX", 20 },
+            {"PLASTIC_MIN", 8 },
+            {"PLASTIC_MAX", 15 },
+            {"CARBON_MIN", 5 },
+            {"CARBON_MAX", 10 }
         };
         private static readonly Dictionary<string, int> BOOSTER_THRUST_POWER = new Dictionary<string, int>
         {
@@ -510,9 +515,16 @@ namespace Rocket_To_The_Space
                 {
                     if (obj is Image && ((Image)obj).Name == "launchpad")
                     {
-                        Canvas.SetLeft((Image)obj, (game.gameCanvas.ActualWidth - ((Image)obj).ActualWidth) / 2);
-                        Canvas.SetTop((Image)obj, game.gameCanvas.ActualHeight - ((Image)obj).ActualHeight - 100);
+                        Canvas.SetLeft(obj, 0);
+                        Canvas.SetTop(obj, 43);
                     }
+                    if (obj is Image && ((Image)obj).Name == "bg")
+                    {
+                        Canvas.SetLeft((Image)obj, 0);
+                        Canvas.SetTop((Image)obj, -64965);
+                    }
+                    camera.Y = 0;
+                    camera.X = 0;
                 }
             }
             UpdateShopTier();
@@ -561,6 +573,10 @@ namespace Rocket_To_The_Space
 
         private void GameClickHandler(object sender, MouseButtonEventArgs e)
         {
+            if (isRocketLaunched)
+            {
+                return;
+            }
             Slot slotClicked;
             if (GetHoveredSlot(out slotClicked, slots, mainCanvas))
             {
@@ -595,15 +611,39 @@ namespace Rocket_To_The_Space
 
         private void GameKeyPressHandler(object sender, KeyEventArgs e)
         {
+            if (isRocketLaunched)
+            {
+                return;
+            }
             if (e.Key >= Key.D1 && e.Key <= Key.D8)
             {
                 int slotIndex = e.Key - Key.D1;
                 SelectSlot(slots[slotIndex], ref lastSelectedSlot);
+                if (slots[slotIndex].GetRocketComponent() != null)
+                {
+                    addToRocketButton.IsEnabled = true;
+                    sellButton.IsEnabled = true;
+                }
+                else
+                {
+                    addToRocketButton.IsEnabled = false;
+                    sellButton.IsEnabled = false;
+                }
             }
             if (e.Key >= Key.NumPad1 && e.Key <= Key.NumPad8)
             {
                 int slotIndex = e.Key - Key.NumPad1;
                 SelectSlot(slots[slotIndex], ref lastSelectedSlot);
+                if (slots[slotIndex].GetRocketComponent() != null)
+                {
+                    addToRocketButton.IsEnabled = true;
+                    sellButton.IsEnabled = true;
+                }
+                else
+                {
+                    addToRocketButton.IsEnabled = false;
+                    sellButton.IsEnabled = false;
+                }
             }
         }
 
@@ -742,6 +782,92 @@ namespace Rocket_To_The_Space
             }
         }
 
+        private void SetInfo(Slot slot)
+        {
+            UCGame game = (UCGame)currentUC;
+            game.shopItemInfo.Visibility = Visibility.Visible;
+            int xOffset = 30;
+            if ((Array.IndexOf(shopSlots, slot) + 1) % 4 == 0)
+            {
+                xOffset = -30;
+            }
+            Canvas.SetTop(game.shopItemInfo, 0);
+            Canvas.SetLeft(game.shopItemInfo, mainWindow.Width - game.shopItemInfo.Width - 20);
+            double currentMargin = 0;
+            double marginInterval = 20;
+            game.shopItemInfo.Children.Clear();
+            Label name = new Label();
+            Label weigth = new Label();
+            Label cost = new Label();
+            name.Content = slot.GetRocketComponent().Name;
+            name.Margin = new Thickness(0, currentMargin, 0, 0);
+            currentMargin += marginInterval;
+            weigth.Content = $"Poids : {slot.GetRocketComponent().Weight}";
+            weigth.Margin = new Thickness(0, currentMargin, 0, 0);
+            currentMargin += marginInterval;
+            cost.Content = $"Prix : {slot.GetRocketComponent().Cost}";
+            cost.Margin = new Thickness(0, currentMargin, 0, 0);
+            currentMargin += marginInterval;
+            name.Foreground = Brushes.White;
+            weigth.Foreground = Brushes.White;
+            cost.Foreground = Brushes.White;
+            game.shopItemInfo.Children.Add(name);
+            game.shopItemInfo.Children.Add(weigth);
+            game.shopItemInfo.Children.Add(cost);
+            if (slot.GetRocketComponent() is RocketBooster)
+            {
+                RocketBooster component = (RocketBooster)slot.GetRocketComponent();
+                Label thrustPower = new Label();
+                Label maxEnergy = new Label();
+                thrustPower.Content = $"Puissance : {component.ThrustPower}";
+                maxEnergy.Content = $"Énergie maximum : {component.MaxEnergy}";
+                thrustPower.Foreground = Brushes.White;
+                maxEnergy.Foreground = Brushes.White;
+                thrustPower.Margin = new Thickness(0, currentMargin, 0, 0);
+                currentMargin += marginInterval;
+                maxEnergy.Margin = new Thickness(0, currentMargin, 0, 0);
+                currentMargin += marginInterval;
+                game.shopItemInfo.Children.Add(thrustPower);
+                game.shopItemInfo.Children.Add(maxEnergy);
+            }
+            else if (slot.GetRocketComponent() is RocketCapsule)
+            {
+                RocketCapsule component = (RocketCapsule)slot.GetRocketComponent();
+                Label controlMultiplier = new Label();
+                controlMultiplier.Content = $"maniabilité : {component.ControlMultiplier}";
+                controlMultiplier.Foreground = Brushes.White;
+                game.shopItemInfo.Children.Add(controlMultiplier);
+                controlMultiplier.Margin = new Thickness(0, currentMargin, 0, 0);
+                currentMargin += marginInterval;
+            }
+            else if (slot.GetRocketComponent() is RocketEngine)
+            {
+                RocketEngine component = (RocketEngine)slot.GetRocketComponent();
+                Label thrustPower = new Label();
+                thrustPower.Content = $"Puissance : {component.ThrustPower}";
+                thrustPower.Foreground = Brushes.White;
+                thrustPower.Margin = new Thickness(0, currentMargin, 0, 0);
+                currentMargin += marginInterval;
+                game.shopItemInfo.Children.Add(thrustPower);
+            }
+            else if (slot.GetRocketComponent() is RocketTank)
+            {
+                RocketTank component = (RocketTank)slot.GetRocketComponent();
+                Label fuelCapacity = new Label();
+                Label fuelLevelInfo = new Label();
+                fuelCapacity.Content = $"Capacité : {component.FuelCapacity}";
+                fuelCapacity.Foreground = Brushes.White;
+                fuelCapacity.Margin = new Thickness(0, currentMargin, 0, 0);
+                currentMargin += marginInterval;
+                fuelLevelInfo.Content = (slot.GetRocketComponent() as RocketTank).FuelAmount > 0 ? "" : "carburant vide";
+                game.shopItemInfo.Children.Add(fuelLevelInfo);
+                fuelLevelInfo.Foreground = Brushes.White;
+                fuelLevelInfo.Margin = new Thickness(0, currentMargin, 0, 0);
+                currentMargin += marginInterval;
+                game.shopItemInfo.Children.Add(fuelCapacity);
+            }
+        }
+
         private void UpdateShopHovering()
         {
             if (!isShopOpened)
@@ -752,85 +878,27 @@ namespace Rocket_To_The_Space
             Slot hoveredSlot = null;
             if (GetHoveredSlot(out hoveredSlot, shopSlots, ((UCGame)currentUC).shop))
             {
-                UCGame game = (UCGame)currentUC;
-                game.shopItemInfo.Visibility = Visibility.Visible;
-                int xOffset = 30;
-                if ((Array.IndexOf(shopSlots, hoveredSlot) + 1) % 4 == 0)
-                {
-                    xOffset = -30;
-                }
-                Canvas.SetTop(game.shopItemInfo, 0);
-                Canvas.SetLeft(game.shopItemInfo, mainWindow.Width - game.shopItemInfo.Width - 20);
-                double currentMargin = 0;
-                double marginInterval = 20;
-                game.shopItemInfo.Children.Clear();
-                Label name = new Label();
-                Label weigth = new Label();
-                Label cost = new Label();
-                name.Content = hoveredSlot.GetRocketComponent().Name;
-                name.Margin = new Thickness(0, currentMargin, 0, 0);
-                currentMargin += marginInterval;
-                weigth.Content = $"Poids : {hoveredSlot.GetRocketComponent().Weight}";
-                weigth.Margin = new Thickness(0, currentMargin, 0, 0);
-                currentMargin += marginInterval;
-                cost.Content = $"Prix : {hoveredSlot.GetRocketComponent().Cost}";
-                cost.Margin = new Thickness(0, currentMargin, 0, 0);
-                currentMargin += marginInterval;
-                name.Foreground = Brushes.White;
-                weigth.Foreground = Brushes.White;
-                cost.Foreground = Brushes.White;
-                game.shopItemInfo.Children.Add(name);
-                game.shopItemInfo.Children.Add(weigth);
-                game.shopItemInfo.Children.Add(cost);
-                if (hoveredSlot.GetRocketComponent() is RocketBooster)
-                {
-                    RocketBooster component = (RocketBooster)hoveredSlot.GetRocketComponent();
-                    Label thrustPower = new Label();
-                    Label maxEnergy = new Label();
-                    thrustPower.Content = $"Puissance : {component.ThrustPower}";
-                    maxEnergy.Content = $"Énergie maximum : {component.MaxEnergy}";
-                    thrustPower.Foreground = Brushes.White;
-                    maxEnergy.Foreground = Brushes.White;
-                    thrustPower.Margin = new Thickness(0, currentMargin, 0, 0);
-                    currentMargin += marginInterval;
-                    maxEnergy.Margin = new Thickness(0, currentMargin, 0, 0);
-                    currentMargin += marginInterval;
-                    game.shopItemInfo.Children.Add(thrustPower);
-                    game.shopItemInfo.Children.Add(maxEnergy);
-                } else if (hoveredSlot.GetRocketComponent() is RocketCapsule)
-                {
-                    RocketCapsule component = (RocketCapsule)hoveredSlot.GetRocketComponent();
-                    Label controlMultiplier = new Label();
-                    controlMultiplier.Content = $"maniabilité : {component.ControlMultiplier}";
-                    controlMultiplier.Foreground = Brushes.White;
-                    game.shopItemInfo.Children.Add(controlMultiplier);
-                    controlMultiplier.Margin = new Thickness(0, currentMargin, 0, 0);
-                    currentMargin += marginInterval;
-                } else if (hoveredSlot.GetRocketComponent() is RocketEngine)
-                {
-                    RocketEngine component = (RocketEngine)hoveredSlot.GetRocketComponent();
-                    Label thrustPower = new Label();
-                    thrustPower.Content = $"Puissance : {component.ThrustPower}";
-                    thrustPower.Foreground = Brushes.White;
-                    thrustPower.Margin = new Thickness(0, currentMargin, 0, 0);
-                    currentMargin += marginInterval;
-                    game.shopItemInfo.Children.Add(thrustPower);
-                } else if (hoveredSlot.GetRocketComponent() is RocketTank)
-                {
-                    RocketTank component = (RocketTank)hoveredSlot.GetRocketComponent();
-                    Label fuelCapacity = new Label();
-                    fuelCapacity.Content = $"Capacité : {component.FuelCapacity}";
-                    fuelCapacity.Foreground = Brushes.White;
-                    fuelCapacity.Margin = new Thickness(0, currentMargin, 0, 0);
-                    currentMargin += marginInterval;
-                    game.shopItemInfo.Children.Add(fuelCapacity);
-                }
+               SetInfo(hoveredSlot);
             } else
             {
                 ((UCGame)currentUC).shopItemInfo.Visibility = Visibility.Hidden;
             }
 
         }
+
+        private void UpdateInvetorySlotHovering()
+        {
+            Slot hoveredSlot = null;
+            if (GetHoveredSlot(out hoveredSlot, slots, ((UCGame)currentUC).gameCanvas))
+            {
+                SetInfo(hoveredSlot);
+            }
+            else
+            {
+                ((UCGame)currentUC).shopItemInfo.Visibility = Visibility.Hidden;
+            }
+        }
+
 
         private void UpdateMoney()
         {
@@ -845,6 +913,7 @@ namespace Rocket_To_The_Space
             UpdateCamera();
             UpdateShopHovering();
             UpdateMoney();
+            UpdateInvetorySlotHovering();
         }
 
         private bool GetHoveredSlot(out Slot selectedSlot, Slot[] slots, Canvas canvas)
