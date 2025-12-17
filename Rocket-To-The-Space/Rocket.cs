@@ -14,8 +14,8 @@ namespace Rocket_To_The_Space
         public double Speed { get; private set; }
 
         public Rectangle RocketBox { get; private set; }
-        public double X { get; private set; }
-        public double Y { get; private set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public Rocket()
         {
             Components = new List<RocketComponent>();

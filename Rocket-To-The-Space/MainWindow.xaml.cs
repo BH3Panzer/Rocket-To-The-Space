@@ -1,10 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Linq;
 namespace Rocket_To_The_Space
@@ -30,7 +28,6 @@ namespace Rocket_To_The_Space
         private static readonly Random random = new Random();
         private Label[] stageCheckpoint = new Label[6];
         private double[] initialStageCheckpointY = new double[6];
-        private List<Obstacle> obstacles = new List<Obstacle>();
         private MediaPlayer mediaPlayer = new MediaPlayer();
         private uint launchCount = 0;
         private Slot[] shopSlots = new Slot[8];
@@ -464,7 +461,8 @@ namespace Rocket_To_The_Space
         private void JumpToStage(int stageIndex)
         {
             currentStage = stageIndex + 1;
-            camera.Y = initialStageCheckpointY[stageIndex] / BACKGROUND_SPEED_MULTIPLIER;
+            rocket.Y = initialStageCheckpointY[stageIndex] / BACKGROUND_SPEED_MULTIPLIER;
+            camera.Y = (rocket.Y + rocket.RocketBox.ActualHeight + 90) - ((UCGame)currentUC).gameCanvas.Height;
         }
 #else
         }
@@ -609,22 +607,6 @@ namespace Rocket_To_The_Space
 
         }
 
-        private void CreateAsteroid(int x, double y)
-        {
-            BitmapImage asteroid = new BitmapImage(new Uri("pack://application:,,,/Assets/Img/asteroid.png", UriKind.Absolute));
-            Image asteroidImg = new Image();
-            asteroidImg.Source = asteroid;
-            asteroidImg.Width = 64;
-            asteroidImg.Height = 64;
-            Obstacle asteroidObstacle = new Obstacle(ObstacleType.ASTEROID, asteroidImg);
-            ((UCGame)currentUC).gameCanvas.Children.Add(asteroidImg);
-            Canvas.SetLeft(asteroidImg, x);
-            Canvas.SetTop(asteroidImg, y);
-            Panel.SetZIndex(asteroidImg, 2);
-            obstacles.Add(asteroidObstacle);
-
-        }
-
         private void UpdateRocket()
         {
             if (!isRocketLaunched)
@@ -672,6 +654,18 @@ namespace Rocket_To_The_Space
                         Canvas.SetLeft(image, left - localDeltaX);
                         Canvas.SetTop(image, top - localDeltaY);
                     }
+                    if (obj is Label && ((Label)obj).Tag == "checkpoint")
+                    {
+                        double left = Canvas.GetLeft(obj);
+                        double top = Canvas.GetTop(obj);
+                        double localDeltaX = deltaX;
+                        double localDeltaY = deltaY;
+                        localDeltaX *= BACKGROUND_SPEED_MULTIPLIER;
+                        localDeltaY *= BACKGROUND_SPEED_MULTIPLIER;
+                        Label label = (Label)obj;
+                        Canvas.SetLeft(label, left - localDeltaX);
+                        Canvas.SetTop(label, top - localDeltaY);
+                    }
                 }
             }
         }
@@ -716,29 +710,6 @@ namespace Rocket_To_The_Space
             if (Canvas.GetTop(stageCheckpoint[currentStage - 1]) + mainWindow.ActualHeight  >= mainWindow.ActualHeight)
             {
                 currentStage++;
-            }
-        }
-
-        private void UpdateObstacles()
-        {
-            if (currentStage == 5 || currentStage == 6)
-            {
-                int p = random.Next(0,100) ;
-                if (p == 0)
-                {
-                    double y = -20;
-                    int x = random.Next(0, (int)mainWindow.ActualWidth);
-                    Console.WriteLine($"created asteroid at x = {x} y = {y}");
-                    CreateAsteroid(x, y);
-                }
-            }
-
-            foreach (Obstacle obstacle in obstacles)
-            {
-                if (obstacle.Type == ObstacleType.ASTEROID)
-                {
-                    obstacle.SetRotationAngle(obstacle.GetRotationAngle() + 1);
-                }
             }
         }
 
@@ -842,7 +813,6 @@ namespace Rocket_To_The_Space
             UpdateRocket();
             UpdateDecoration();
             UpdateCurrentStage();
-            UpdateObstacles();
             UpdateCamera();
             UpdateShopHovering();
             UpdateMoney();
@@ -875,12 +845,6 @@ namespace Rocket_To_The_Space
             return false;
         }
 
-        Geometry CreateRectGeometry(FrameworkElement e)
-        {
-            return new RectangleGeometry(
-                new Rect(0, 0, e.ActualWidth, e.ActualHeight));
-        }
-
         private void GenerateBaseInventory()
         {
             if (launchCount == 0)
@@ -902,17 +866,6 @@ namespace Rocket_To_The_Space
                 ((UCGame)currentUC).gameCanvas.Children.Add(slots[2].GetRocketComponent().Texture);
                 slots[2].Draw();
             }
-        }
-
-        bool IsColliding(FrameworkElement a, FrameworkElement b)
-        {
-            Geometry g1 = CreateRectGeometry(a);
-            Geometry g2 = CreateRectGeometry(b);
-
-            g1.Transform = a.TransformToVisual(null) as Transform;
-            g2.Transform = b.TransformToVisual(null) as Transform;
-
-            return g1.FillContainsWithDetail(g2) != IntersectionDetail.Empty;
         }
     }
 }
